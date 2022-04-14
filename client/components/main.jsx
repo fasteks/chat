@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import './main.scss'
 
 const Main = () => {
+  const [rows, setRows] = useState(1)
+  const [message, setMessage] = useState('')
   return (
     <div className="main flex flex-col justify-between grow">
       <div className="main__header flex items-center justify-between">
@@ -25,9 +27,23 @@ const Main = () => {
         <button type="button" className="message__button bg-white">
           +
         </button>
-        <input
+        <textarea
           type="text-area"
-          className="message__input grow"
+          className="message__input grow resize-none"
+          rows={rows}
+          value={message}
+          onChange={(e) => {
+            setMessage(e.target.value)
+            if (e.target.value <= 1) {
+              setRows(1)
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && e.shiftKey && rows < 4) {
+              e.preventDefault()
+              setRows(+rows + 1)
+            }
+          }}
           placeholder={`Message to ${'#general'}`}
         />
       </div>
