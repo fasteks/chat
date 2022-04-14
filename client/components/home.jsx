@@ -1,13 +1,16 @@
 import React from 'react'
 import Head from './head'
 
-const Home = () => {
+import Main from './main'
+import Sidebar from './sidebar'
 
+const Home = () => {
   return (
     <div className="min-h-screen">
       <Head title="Home" />
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="">Welcome</p>
+      <div className="min-h-screen flex">
+        <Sidebar />
+        <Main />
       </div>
     </div>
   )

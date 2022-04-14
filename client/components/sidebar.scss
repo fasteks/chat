@@ -1,0 +1,20 @@
+.sidebar {
+  padding: 1rem;
+  font-size: large;
+  color: white;
+  background-color: rgb(65, 25, 160);
+
+  &__title {
+    padding: 0.5rem 0;
+    font-size: x-large;
+    font-weight: 600;
+  }
+
+  &__channels {
+    padding: 0.5rem 0;
+  }
+
+  &__users {
+    padding: 0.5rem 0;
+  }
+}
