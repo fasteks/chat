@@ -39,8 +39,7 @@ const Main = () => {
             }
           }}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' && e.shiftKey && rows < 4) {
-              e.preventDefault()
+            if (e.key === 'Enter' && rows < 4) {
               setRows(+rows + 1)
             }
           }}
