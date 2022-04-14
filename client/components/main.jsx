@@ -22,11 +22,11 @@ const Main = () => {
         <p>messages</p>
       </div>
       <div className="main__message message flex">
-        <button type="button" className="message__button">
+        <button type="button" className="message__button bg-white">
           +
         </button>
         <input
-          type="text"
+          type="text-area"
           className="message__input grow"
           placeholder={`Message to ${'#general'}`}
         />
