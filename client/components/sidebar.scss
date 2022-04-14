@@ -11,14 +11,20 @@
 
     & button {
       font-size: 1.2rem;
-      width: 1.70rem;
-      height: 1.70rem;
+      width: 1.7rem;
+      height: 1.7rem;
       background-clip: text;
     }
   }
 
   &__channels {
     padding: 0.5rem 1rem;
+
+    & button {
+      padding: 0 0.4rem 0.45rem;
+      font-weight: 500;
+      font-size: 1.5rem;
+    }
   }
 
   &__channel {

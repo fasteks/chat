@@ -18,7 +18,12 @@ const Sidebar = () => {
           {!bell && <FontAwesomeIcon icon={faBellSlash} onClick={() => setBell(!bell)} />}
         </button>
       </h2>
-      <h3 className="sidebar__channels">Channels</h3>
+      <h3 className="sidebar__channels flex justify-between items-center">
+        Channels
+        <button type="button" className="">
+          +
+        </button>
+      </h3>
       <button
         type="button"
         className={classnames('sidebar__channel', {
@@ -28,7 +33,7 @@ const Sidebar = () => {
           setActive(!active)
         }}
       >
-        # general
+        #general
       </button>
       <div className="sidebar__users flex flex-col">
         <h3>Direct Messages</h3>

@@ -7,7 +7,7 @@ const Main = () => {
   const [message, setMessage] = useState('')
   return (
     <div className="main flex flex-col justify-between grow">
-      <div className="main__header flex items-center justify-between">
+      <div className="main__header flex flex-wrap items-center justify-between">
         <div className="header flex flex-col">
           <h3 className="header__title">#general</h3>
           <p className="header__description">Chill chatting about everyting</p>
