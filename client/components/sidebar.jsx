@@ -1,14 +1,23 @@
 import React, { useState } from 'react'
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faBell, faBellSlash } from '@fortawesome/free-regular-svg-icons'
 import classnames from 'classnames'
 
 import './sidebar.scss'
 
 const Sidebar = () => {
   const [active, setActive] = useState(false)
+  const [bell, setBell] = useState(true)
   return (
     <div className="sidebar flex flex-col">
-      <h2 className="sidebar__title ">Chat</h2>
+      <h2 className="sidebar__title flex items-center justify-between">
+        Chat
+        <button type="button">
+          {bell && <FontAwesomeIcon icon={faBell} onClick={() => setBell(!bell)} />}
+          {!bell && <FontAwesomeIcon icon={faBellSlash} onClick={() => setBell(!bell)} />}
+        </button>
+      </h2>
       <h3 className="sidebar__channels">Channels</h3>
       <button
         type="button"

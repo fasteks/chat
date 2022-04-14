@@ -7,6 +7,14 @@
     padding: 0.5rem 1rem;
     font-size: x-large;
     font-weight: 600;
+    background-clip: text;
+
+    & button {
+      font-size: 1.2rem;
+      width: 1.7rem;
+      height: 1.7rem;
+      background-clip: text;
+    }
   }
 
   &__channels {
