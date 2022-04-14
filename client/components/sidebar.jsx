@@ -1,14 +1,24 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
+import classnames from 'classnames'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBell, faBellSlash } from '@fortawesome/free-regular-svg-icons'
-import classnames from 'classnames'
 
 import './sidebar.scss'
 
+import { getChannels } from '../redux/reducers/channels'
+
 const Sidebar = () => {
-  const [active, setActive] = useState(false)
+  const dispatch = useDispatch()
+  const { channels } = useSelector((s) => s.channels)
+  const [active, setActive] = useState(null)
   const [bell, setBell] = useState(true)
+
+  useEffect(() => {
+    dispatch(getChannels())
+  }, [])
+
   return (
     <div className="sidebar flex flex-col">
       <h2 className="sidebar__title flex items-center justify-between">
@@ -24,17 +34,27 @@ const Sidebar = () => {
           +
         </button>
       </h3>
-      <button
-        type="button"
-        className={classnames('sidebar__channel', {
-          active
-        })}
-        onClick={() => {
-          setActive(!active)
-        }}
-      >
-        #general
-      </button>
+      {Object.keys(channels).map((el, index) => {
+        return (
+          <button
+            key={el + index}
+            type="button"
+            className={classnames('sidebar__channel flex flex-col', {
+              active: active === el
+            })}
+            onClick={() => {
+              if (active === el) {
+                setActive(null)
+              }
+              if (active !== el) {
+                setActive(el)
+              }
+            }}
+          >
+            {el}
+          </button>
+        )
+      }) || <span className="hidden">&nbsp;</span>}
       <div className="sidebar__users flex flex-col">
         <h3>Direct Messages</h3>
         <p>fasteks (me)</p>

@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 const GET_CHANNELS = '@chat/channel/GET_CHANNELS'
 const ADD_CHANNEL = '@chat/channel/ADD_CHANNEL'
 
