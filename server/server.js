@@ -9,6 +9,8 @@ import cookieParser from 'cookie-parser'
 import config from './config'
 import Html from '../client/html'
 
+const { readFile, writeFile } = require('fs').promises
+
 require('colors')
 
 let Root
@@ -33,6 +35,22 @@ const middleware = [
 ]
 
 middleware.forEach((it) => server.use(it))
+
+const getChannels = () => {
+  return readFile(`${__dirname}/data/channels.json`, 'utf-8')
+    .then((string) => {
+      return JSON.parse(string)
+    })
+    .catch(async () => {
+      await writeFile(`${__dirname}/data/channels.json`, JSON.stringify({}), 'utf-8')
+      return {}
+    })
+}
+
+server.get('/api/v1/channels', async (req, res) => {
+  const channels = await getChannels()
+  res.json(channels)
+})
 
 server.use('/api/', (req, res) => {
   res.status(404)
