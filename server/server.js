@@ -52,6 +52,14 @@ server.get('/api/v1/channels', async (req, res) => {
   res.json(channels)
 })
 
+server.post('/api/v1/channels', async (req, res) => {
+  const { title } = req.body
+  const channels = await getChannels()
+  const updatedChannels = { ...channels, [title]: { usersId: [], messages: [] } }
+  await writeFile(`${__dirname}/data/channels.json`, JSON.stringify(updatedChannels), 'utf-8')
+  res.json(updatedChannels)
+})
+
 server.use('/api/', (req, res) => {
   res.status(404)
   res.end()
