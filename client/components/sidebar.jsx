@@ -13,7 +13,7 @@ import { addChannel, channelLogin, channelLogout, switchChannel } from '../redux
 const Sidebar = () => {
   const dispatch = useDispatch()
   const { channels } = useSelector((s) => s.channels)
-  const { id, name } = useSelector((s) => s.auth.user)
+  const { id, name, isOnline } = useSelector((s) => s.auth.user)
   const [active, setActive] = useState(null)
   const [bell, setBell] = useState(true)
   const [channelsClicked, setchannelsClicked] = useState(false)
@@ -28,7 +28,10 @@ const Sidebar = () => {
           {!bell && <FontAwesomeIcon icon={faBellSlash} onClick={() => setBell(!bell)} />}
         </button>
       </h2>
-      <h3 className="sidebar__user">{name}</h3>
+      <h3 className="sidebar__user">
+        <i className={classnames('status', { 'status--online': isOnline })} />
+        {name}
+      </h3>
       <h3
         className="sidebar__channels channels"
         onBlur={(e) => {
