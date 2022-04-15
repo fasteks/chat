@@ -88,6 +88,7 @@ const Sidebar = () => {
             })}
             onClick={() => {
               if (active === el) {
+                dispatch(switchChannel(''))
                 setActive(null)
               }
               if (active !== el) {
