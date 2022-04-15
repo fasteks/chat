@@ -8,7 +8,7 @@ import { faCheck } from '@fortawesome/free-solid-svg-icons'
 import classnames from 'classnames'
 import './sidebar.scss'
 
-import { addChannel, switchChannel } from '../redux/reducers/channels'
+import { addChannel, channelLogin, channelLogout, switchChannel } from '../redux/reducers/channels'
 
 const Sidebar = () => {
   const dispatch = useDispatch()
@@ -89,11 +89,11 @@ const Sidebar = () => {
             })}
             onClick={() => {
               if (active === el) {
-                dispatch(switchChannel(el, id, 'logout'))
+                dispatch(switchChannel(el, id, channelLogout))
                 setActive(null)
               }
               if (active !== el) {
-                dispatch(switchChannel(el, id, 'login'))
+                dispatch(switchChannel(el, id, channelLogin))
                 setActive(el)
               }
             }}

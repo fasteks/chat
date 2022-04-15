@@ -3,6 +3,8 @@ import axios from 'axios'
 const GET_CHANNELS = '@chat/channel/GET_CHANNELS'
 const ADD_CHANNEL = '@chat/channel/ADD_CHANNEL'
 const SWITCH_CHANNEL = '@chat/channel/SWITCH_CHANNEL'
+export const channelLogin = 'login'
+export const channelLogout = 'logout'
 
 const initialState = {
   channels: {},
@@ -96,7 +98,7 @@ export function switchChannel(channel, id, action) {
         return dispatch({
           type: SWITCH_CHANNEL,
           channelsObj: data,
-          setChannel: action === 'login' ? channel : ''
+          setChannel: action === channelLogin ? channel : ''
         })
       })
       .catch((err) => err)

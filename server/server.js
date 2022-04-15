@@ -73,7 +73,6 @@ server.post('/api/v1/channel', async (req, res) => {
       messages: []
     }
   }
-  // await writeFile(`${__dirname}/data/channels.json`, JSON.stringify(updatedChannels), 'utf-8')
   res.json(updatedChannels)
 })
 
