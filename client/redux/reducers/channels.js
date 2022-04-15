@@ -4,7 +4,8 @@ const GET_CHANNELS = '@chat/channel/GET_CHANNELS'
 const ADD_CHANNEL = '@chat/channel/ADD_CHANNEL'
 
 const initialState = {
-  channels: {}
+  channels: {},
+  currentChannel: ''
 }
 
 // const initialState = {

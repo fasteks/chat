@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useState } from 'react'
+import { useSelector } from 'react-redux'
 
 import classnames from 'classnames'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -7,17 +7,10 @@ import { faBell, faBellSlash } from '@fortawesome/free-regular-svg-icons'
 
 import './sidebar.scss'
 
-import { getChannels } from '../redux/reducers/channels'
-
 const Sidebar = () => {
-  const dispatch = useDispatch()
   const { channels } = useSelector((s) => s.channels)
   const [active, setActive] = useState(null)
   const [bell, setBell] = useState(true)
-
-  useEffect(() => {
-    dispatch(getChannels())
-  }, [])
 
   return (
     <div className="sidebar flex flex-col">
