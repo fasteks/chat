@@ -18,16 +18,15 @@
   }
 
   &__channels {
-    padding: 0 1rem;
-
-    & button {
-      padding: 0 0.4rem 0.4rem;
-      font-weight: 500;
-      font-size: 1.5rem;
-    }
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1rem;
   }
 
   &__channel {
+    display: flex;
+    flex-direction: column;
     padding: 0.15rem 1rem;
     text-align: left;
 
@@ -43,5 +42,50 @@
 
   &__applications {
     padding: 0.5rem 1rem;
+  }
+}
+
+.channels {
+  order: 0;
+
+  &__input {
+    height: 1rem;
+    width: 5.1rem;
+    color: black;
+    font-size: medium;
+    outline: none;
+  }
+
+  &__button {
+    margin-bottom: 0.65rem;
+    margin-right: 0.1rem;
+    line-height: 1.3rem;
+    font-size: 2rem;
+    background-clip: text;
+    overflow: hidden;
+
+    &--plus {
+      order: 4;
+      transition-property: transform;
+      transition-duration: 150ms;
+      transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+    }
+
+    &--minus {
+      order: 2;
+      transition-property: transform;
+      transition-duration: 150ms;
+      transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+      transform: rotate(45deg) scale(1.1) translateX(0.15rem);
+    }
+
+    &--check {
+      order: 1;
+      margin: auto auto;
+      padding: 0 0 0.1rem 0.1rem;
+      font-size: 1.2rem;
+      vertical-align: text-top;
+      transform: scale(1.05);
+    }
   }
 }

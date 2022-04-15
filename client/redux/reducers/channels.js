@@ -2,6 +2,7 @@ import axios from 'axios'
 
 const GET_CHANNELS = '@chat/channel/GET_CHANNELS'
 const ADD_CHANNEL = '@chat/channel/ADD_CHANNEL'
+const SWITCH_CHANNEL = '@chat/channel/SWITCH_CHANNEL'
 
 const initialState = {
   channels: {},
@@ -39,6 +40,12 @@ export default (state = initialState, action = {}) => {
         channels: action.channelsObj
       }
     }
+    case SWITCH_CHANNEL: {
+      return {
+        ...state,
+        currentChannel: action.setChannel
+      }
+    }
     default:
       return state
   }
@@ -70,5 +77,11 @@ export function addChannel(title) {
         dispatch({ type: ADD_CHANNEL, channelsObj: data })
       })
       .catch((err) => err)
+  }
+}
+
+export function switchChannel(channel) {
+  return (dispatch) => {
+    return dispatch({ type: SWITCH_CHANNEL, setChannel: channel })
   }
 }

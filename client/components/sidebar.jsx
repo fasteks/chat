@@ -1,16 +1,22 @@
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
-import classnames from 'classnames'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBell, faBellSlash } from '@fortawesome/free-regular-svg-icons'
+import { faCheck } from '@fortawesome/free-solid-svg-icons'
 
+import classnames from 'classnames'
 import './sidebar.scss'
 
+import { addChannel, switchChannel } from '../redux/reducers/channels'
+
 const Sidebar = () => {
+  const dispatch = useDispatch()
   const { channels } = useSelector((s) => s.channels)
   const [active, setActive] = useState(null)
   const [bell, setBell] = useState(true)
+  const [channelsClicked, setchannelsClicked] = useState(false)
+  const [channelNew, setChannelNew] = useState('')
 
   return (
     <div className="sidebar flex flex-col">
@@ -21,18 +27,63 @@ const Sidebar = () => {
           {!bell && <FontAwesomeIcon icon={faBellSlash} onClick={() => setBell(!bell)} />}
         </button>
       </h2>
-      <h3 className="sidebar__channels flex justify-between items-center">
-        Channels
-        <button type="button" className="">
-          +
-        </button>
+      <h3 className="sidebar__channels channels">
+        {!channelsClicked ? (
+          <span className="channels__title">Channels</span>
+        ) : (
+          <input
+            type="text"
+            className="channels__input"
+            value={channelNew}
+            onChange={(e) => {
+              setChannelNew(e.target.value)
+            }}
+          />
+        )}
+        {!channelsClicked ? (
+          <button
+            type="button"
+            className="channels__button channels__button--plus"
+            onClick={() => {
+              setchannelsClicked(!channelsClicked)
+            }}
+          >
+            +
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="channels__button channels__button--minus"
+            onClick={() => {
+              setChannelNew('')
+              setchannelsClicked(!channelsClicked)
+            }}
+          >
+            +
+          </button>
+        )}
+        {channelsClicked && (
+          <button
+            type="button"
+            className="channels__button channels__button--check"
+            onClick={() => {
+              if (channelNew.length > 1 && channelNew.trim() !== '') {
+                dispatch(addChannel(channelNew.trim()))
+                setChannelNew('')
+                setchannelsClicked(!channelsClicked)
+              }
+            }}
+          >
+            <FontAwesomeIcon icon={faCheck} />
+          </button>
+        )}
       </h3>
       {Object.keys(channels).map((el, index) => {
         return (
           <button
             key={el + index}
             type="button"
-            className={classnames('sidebar__channel flex flex-col', {
+            className={classnames('sidebar__channel', {
               active: active === el
             })}
             onClick={() => {
@@ -40,6 +91,7 @@ const Sidebar = () => {
                 setActive(null)
               }
               if (active !== el) {
+                dispatch(switchChannel(el))
                 setActive(el)
               }
             }}
