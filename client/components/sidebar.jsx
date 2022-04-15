@@ -13,7 +13,7 @@ import { addChannel, channelLogin, channelLogout, switchChannel } from '../redux
 const Sidebar = () => {
   const dispatch = useDispatch()
   const { channels } = useSelector((s) => s.channels)
-  const { id } = useSelector((s) => s.auth.user)
+  const { id, name } = useSelector((s) => s.auth.user)
   const [active, setActive] = useState(null)
   const [bell, setBell] = useState(true)
   const [channelsClicked, setchannelsClicked] = useState(false)
@@ -28,13 +28,23 @@ const Sidebar = () => {
           {!bell && <FontAwesomeIcon icon={faBellSlash} onClick={() => setBell(!bell)} />}
         </button>
       </h2>
-      <h3 className="sidebar__channels channels">
+      <h3 className="sidebar__user">{name}</h3>
+      <h3
+        className="sidebar__channels channels"
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget)) {
+            // Not triggered when swapping focus between children
+            setchannelsClicked(false)
+          }
+        }}
+      >
         {!channelsClicked ? (
           <span className="channels__title">Channels</span>
         ) : (
           <input
             type="text"
             className="channels__input"
+            autoFocus
             value={channelNew}
             onChange={(e) => {
               setChannelNew(e.target.value)
@@ -46,7 +56,7 @@ const Sidebar = () => {
             type="button"
             className="channels__button channels__button--plus"
             onClick={() => {
-              setchannelsClicked(!channelsClicked)
+              setchannelsClicked(true)
             }}
           >
             +
@@ -57,7 +67,7 @@ const Sidebar = () => {
             className="channels__button channels__button--minus"
             onClick={() => {
               setChannelNew('')
-              setchannelsClicked(!channelsClicked)
+              setchannelsClicked(false)
             }}
           >
             +
@@ -68,10 +78,10 @@ const Sidebar = () => {
             type="button"
             className="channels__button channels__button--check"
             onClick={() => {
+              setChannelNew('')
               if (channelNew.length > 1 && channelNew.trim() !== '') {
                 dispatch(addChannel(channelNew.trim()))
-                setChannelNew('')
-                setchannelsClicked(!channelsClicked)
+                setchannelsClicked(false)
               }
             }}
           >
@@ -103,7 +113,7 @@ const Sidebar = () => {
         )
       }) || <span className="hidden">&nbsp;</span>}
       <div className="sidebar__users flex flex-col">
-        <h3>Direct Messages</h3>
+        <h3 className="users__title">Direct Messages</h3>
         <p>fasteks (me)</p>
         <p>Adam</p>
         <p>Olivia</p>
