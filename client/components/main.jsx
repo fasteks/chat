@@ -15,7 +15,7 @@ const Main = () => {
     <div className="main flex flex-col justify-between grow">
       <div className="main__header flex flex-wrap items-center justify-between">
         <div className="header flex flex-col">
-          <h3 className="header__title">#general</h3>
+          <h3 className="header__title">{currentChannel}</h3>
           <p className="header__description">Chill chatting about everyting</p>
         </div>
         <div>
@@ -38,7 +38,7 @@ const Main = () => {
           <p className="h-full flex justify-center items-center">No one sent a message yet!</p>
         )}
       </div>
-      <div className="main__message message flex">
+      {!isChannel && <div className="main__message message flex">
         <button type="button" className="message__button bg-white">
           +
         </button>
@@ -60,7 +60,7 @@ const Main = () => {
           }}
           placeholder={`Message to ${'#general'}`}
         />
-      </div>
+      </div>}
     </div>
   )
 }
