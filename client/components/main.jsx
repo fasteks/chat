@@ -38,29 +38,31 @@ const Main = () => {
           <p className="h-full flex justify-center items-center">No one sent a message yet!</p>
         )}
       </div>
-      {!isChannel && <div className="main__message message flex">
-        <button type="button" className="message__button bg-white">
-          +
-        </button>
-        <textarea
-          type="text-area"
-          className="message__input grow resize-none"
-          rows={rows}
-          value={message}
-          onChange={(e) => {
-            setMessage(e.target.value)
-            if (e.target.value <= 1) {
-              setRows(1)
-            }
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && rows < 4) {
-              setRows(+rows + 1)
-            }
-          }}
-          placeholder={`Message to ${'#general'}`}
-        />
-      </div>}
+      {!isChannel && (
+        <div className="main__message message flex">
+          <button type="button" className="message__button bg-white">
+            +
+          </button>
+          <textarea
+            type="text-area"
+            className="message__input grow resize-none"
+            rows={rows}
+            value={message}
+            onChange={(e) => {
+              setMessage(e.target.value)
+              if (e.target.value <= 1) {
+                setRows(1)
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && rows < 4) {
+                setRows(+rows + 1)
+              }
+            }}
+            placeholder={`Message to ${'#general'}`}
+          />
+        </div>
+      )}
     </div>
   )
 }

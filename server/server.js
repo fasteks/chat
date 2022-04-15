@@ -60,6 +60,23 @@ server.post('/api/v1/channels', async (req, res) => {
   res.json(updatedChannels)
 })
 
+server.post('/api/v1/channel', async (req, res) => {
+  const { id, channel, action } = req.body
+  const channels = await getChannels()
+  const updatedChannels = {
+    ...channels,
+    [channel]: {
+      usersId:
+        action === 'login'
+          ? [...channels[channel].usersId, id]
+          : channels[channel].usersId.filter((el) => el !== id),
+      messages: []
+    }
+  }
+  // await writeFile(`${__dirname}/data/channels.json`, JSON.stringify(updatedChannels), 'utf-8')
+  res.json(updatedChannels)
+})
+
 server.use('/api/', (req, res) => {
   res.status(404)
   res.end()

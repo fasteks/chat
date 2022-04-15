@@ -1,7 +1,8 @@
 const initialState = {
   token: '',
   user: {
-    name: ''
+    name: 'John',
+    id: '28'
   }
 }
 /* eslint-disable default-param-last */

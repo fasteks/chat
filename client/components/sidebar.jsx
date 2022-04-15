@@ -13,6 +13,7 @@ import { addChannel, switchChannel } from '../redux/reducers/channels'
 const Sidebar = () => {
   const dispatch = useDispatch()
   const { channels } = useSelector((s) => s.channels)
+  const { id } = useSelector((s) => s.auth.user)
   const [active, setActive] = useState(null)
   const [bell, setBell] = useState(true)
   const [channelsClicked, setchannelsClicked] = useState(false)
@@ -88,11 +89,11 @@ const Sidebar = () => {
             })}
             onClick={() => {
               if (active === el) {
-                dispatch(switchChannel(''))
+                dispatch(switchChannel(el, id, 'logout'))
                 setActive(null)
               }
               if (active !== el) {
-                dispatch(switchChannel(el))
+                dispatch(switchChannel(el, id, 'login'))
                 setActive(el)
               }
             }}

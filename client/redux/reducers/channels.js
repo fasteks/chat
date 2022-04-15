@@ -43,6 +43,7 @@ export default (state = initialState, action = {}) => {
     case SWITCH_CHANNEL: {
       return {
         ...state,
+        channels: action.channelsObj,
         currentChannel: action.setChannel
       }
     }
@@ -80,8 +81,24 @@ export function addChannel(title) {
   }
 }
 
-export function switchChannel(channel) {
-  return (dispatch) => {
-    return dispatch({ type: SWITCH_CHANNEL, setChannel: channel })
+export function switchChannel(channel, id, action) {
+  return async (dispatch) => {
+    await axios({
+      method: 'post',
+      url: `/api/v1/channel`,
+      data: {
+        channel,
+        id,
+        action
+      }
+    })
+      .then(({ data }) => {
+        return dispatch({
+          type: SWITCH_CHANNEL,
+          channelsObj: data,
+          setChannel: action === 'login' ? channel : ''
+        })
+      })
+      .catch((err) => err)
   }
 }
