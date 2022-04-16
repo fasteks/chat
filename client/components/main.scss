@@ -1,5 +1,6 @@
 .main {
-  position: relative;
+  max-height: screen;
+
   font-size: large;
   color: black;
   background-color: rgb(218, 204, 255);
@@ -10,11 +11,12 @@
   }
 
   &__messages {
+    max-height: 75vh;
+    overflow-y: auto;
     padding: 0.5rem 1rem;
   }
 
   &__message {
-    position: fixed;
     padding: 0.5rem 1rem;
   }
 }
