@@ -1,12 +1,16 @@
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { sendMessage } from '../redux/reducers/channels'
 
 import './main.scss'
+import Message from './message'
 
 const Main = () => {
+  const dispatch = useDispatch()
   const [rows, setRows] = useState(1)
   const [message, setMessage] = useState('')
   const { channels, currentChannel } = useSelector((s) => s.channels)
+  const { id } = useSelector((s) => s.auth.user)
   const isChannel = currentChannel.length === 0
   const areChannels = Object.keys(channels)?.length !== 0
   const areMessages = channels[currentChannel]?.messages.length !== 0
@@ -31,8 +35,9 @@ const Main = () => {
         )}
         {!isChannel &&
           areMessages &&
-          channels[currentChannel]?.messages.map((it, index) => {
-            return <p key={index}>{it}</p>
+          channels[currentChannel]?.messages.map((it) => {
+            // return <p key={index}>{it}</p>
+            return <Message key={it.messageId} message={it} />
           })}
         {!isChannel && !areMessages && (
           <p className="h-full flex justify-center items-center">No one sent a message yet!</p>
@@ -40,7 +45,14 @@ const Main = () => {
       </div>
       {!isChannel && (
         <div className="main__message message flex">
-          <button type="button" className="message__button bg-white">
+          <button
+            type="button"
+            className="message__button bg-white"
+            onClick={() => {
+              dispatch(sendMessage(currentChannel, id, message))
+              setMessage('')
+            }}
+          >
             +
           </button>
           <textarea
@@ -59,7 +71,7 @@ const Main = () => {
                 setRows(+rows + 1)
               }
             }}
-            placeholder={`Message to ${'#general'}`}
+            placeholder={`Message to ${currentChannel}`}
           />
         </div>
       )}

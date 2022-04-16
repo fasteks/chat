@@ -6,7 +6,11 @@ import { renderToStaticNodeStream } from 'react-dom/server'
 import React from 'react'
 
 import cookieParser from 'cookie-parser'
+
+import shortid from 'shortid'
+
 import config from './config'
+
 import Html from '../client/html'
 
 const { readFile, writeFile } = require('fs').promises
@@ -66,13 +70,38 @@ server.post('/api/v1/channel', async (req, res) => {
   const updatedChannels = {
     ...channels,
     [channel]: {
+      ...channels[channel],
       usersId:
         action === 'login'
           ? [...channels[channel].usersId, id]
-          : channels[channel].usersId.filter((el) => el !== id),
-      messages: []
+          : channels[channel].usersId.filter((el) => el !== id)
     }
   }
+  await writeFile(`${__dirname}/data/channels.json`, JSON.stringify(updatedChannels), 'utf-8')
+  res.json(updatedChannels)
+})
+
+const setMessage = (id, messageText) => {
+  return {
+    userId: id,
+    messageId: shortid.generate(),
+    messageStr: messageText,
+    messageDate: +new Date(),
+    meta: {}
+  }
+}
+
+server.post('/api/v1/channel/message', async (req, res) => {
+  const { currentChannel, id, message } = req.body
+  const channels = await getChannels()
+  const updatedChannels = {
+    ...channels,
+    [currentChannel]: {
+      ...channels[currentChannel],
+      messages: [...channels[currentChannel].messages, setMessage(id, message)]
+    }
+  }
+  await writeFile(`${__dirname}/data/channels.json`, JSON.stringify(updatedChannels), 'utf-8')
   res.json(updatedChannels)
 })
 

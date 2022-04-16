@@ -1,0 +1,32 @@
+.message {
+  display: flex;
+
+
+  &__icon {
+    width: 10rem;
+    height: 10rem;
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+
+    & .information {
+
+      &__header {
+      display: flex;
+
+        .header {
+
+          &__name {
+            font-weight: 600;
+          }
+
+          &__date {
+            font-weight: 400;
+          }
+        }
+      }
+    }
+  }
+}

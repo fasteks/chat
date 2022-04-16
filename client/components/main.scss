@@ -1,4 +1,5 @@
 .main {
+  position: relative;
   font-size: large;
   color: black;
   background-color: rgb(218, 204, 255);
@@ -13,6 +14,7 @@
   }
 
   &__message {
+    position: fixed;
     padding: 0.5rem 1rem;
   }
 }
@@ -44,7 +46,9 @@
 }
 
 .message {
+
   &__button {
+
     padding: 0.1rem 0.3rem 0.5rem;
     border: 0.1rem solid black;
     border-right: 0;

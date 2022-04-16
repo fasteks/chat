@@ -1,7 +1,7 @@
 const initialState = {
   token: '',
   user: {
-    name: 'John',
+    name: 'fasteks',
     id: '28',
     isOnline: true
   }
