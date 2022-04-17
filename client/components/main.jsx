@@ -9,35 +9,17 @@ import Message from './message'
 
 const Main = () => {
   const dispatch = useDispatch()
-  // const [rows, setRows] = useState(1)
   const [message, setMessage] = useState('')
   const { channels, currentChannel } = useSelector((s) => s.channels)
   const { id } = useSelector((s) => s.auth.user)
   const isChannel = currentChannel.length === 0
   const areChannels = Object.keys(channels)?.length !== 0
-  const areMessages = channels[currentChannel]?.messages.length !== 0
+  const messagesLength = channels[currentChannel]?.messages.length
+  const areMessages = messagesLength !== 0
 
   useEffect(() => {
     document.querySelector('.main__messages').lastChild.scrollIntoView()
-  }, [channels[currentChannel]?.messages.length])
-
-  // const cols = 118
-  // useEffect(() => {
-  //   if (message.length === 0) {
-  //     return setRows(1)
-  //   }
-  //   if (message.split('').includes('\n')) {
-  //     const q = message.split('').filter(it => it === '\n').length >= 3 ? 3 : message.split('').filter(it => it === '\n').length + 1
-  //     return setRows(q)
-  //   }
-  //   if (message.length > (cols * rows) && rows < 3 && message.split('').filter(it => it === '\n').length < 3) {
-  //     return setRows(rows + 1)
-  //   }
-  //   if (message.length <= (cols * (rows - 1)) && rows !== 1 && !message.split('').includes('\n')) {
-  //     return setRows(rows - 1)
-  //   }
-  //   return () => {}
-  // }, [message])
+  }, [messagesLength])
 
   return (
     <div className="main flex flex-col justify-between grow">
@@ -80,24 +62,6 @@ const Main = () => {
           >
             +
           </button>
-          {/* <textarea
-            type="text-area"
-            autoFocus
-            className="message__input grow resize-none"
-            rows={rows}
-            cols={cols}
-            value={message}
-            onChange={(e) => {
-              setMessage(e.target.value)
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey && message.length > 1 && message.trim() !== '') {
-                dispatch(sendMessage(currentChannel, id, message))
-                setMessage('')
-              }
-            }}
-            placeholder={`Message to ${currentChannel}`}
-          /> */}
           <TextareaAutosize
             type="text-area"
             autoFocus
@@ -127,3 +91,43 @@ const Main = () => {
 Main.propTypes = {}
 
 export default Main
+
+// my own textarea
+
+// const [rows, setRows] = useState(1)
+// const cols = 118
+// useEffect(() => {
+//   if (message.length === 0) {
+//     return setRows(1)
+//   }
+//   if (message.split('').includes('\n')) {
+//     const q = message.split('').filter(it => it === '\n').length >= 3 ? 3 : message.split('').filter(it => it === '\n').length + 1
+//     return setRows(q)
+//   }
+//   if (message.length > (cols * rows) && rows < 3 && message.split('').filter(it => it === '\n').length < 3) {
+//     return setRows(rows + 1)
+//   }
+//   if (message.length <= (cols * (rows - 1)) && rows !== 1 && !message.split('').includes('\n')) {
+//     return setRows(rows - 1)
+//   }
+//   return () => {}
+// }, [message])
+
+/* <textarea
+            type="text-area"
+            autoFocus
+            className="message__input grow resize-none"
+            rows={rows}
+            cols={cols}
+            value={message}
+            onChange={(e) => {
+              setMessage(e.target.value)
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey && message.length > 1 && message.trim() !== '') {
+                dispatch(sendMessage(currentChannel, id, message))
+                setMessage('')
+              }
+            }}
+            placeholder={`Message to ${currentChannel}`}
+          /> */
