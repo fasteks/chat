@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import TextareaAutosize from 'react-textarea-autosize'
 
@@ -16,6 +16,10 @@ const Main = () => {
   const isChannel = currentChannel.length === 0
   const areChannels = Object.keys(channels)?.length !== 0
   const areMessages = channels[currentChannel]?.messages.length !== 0
+
+  useEffect(() => {
+    document.querySelector('.main__messages').lastChild.scrollIntoView()
+  }, [channels[currentChannel]?.messages.length])
 
   // const cols = 118
   // useEffect(() => {
