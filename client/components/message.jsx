@@ -6,15 +6,13 @@ import './message.scss'
 const Message = ({ message }) => {
   return (
     <div className="message">
-      <img className="message__icon" src="../assets/images/such_wow_favicon.ico" alt="user-icon" />
+      <img className="message__icon" src="images/such_wow.jpg" alt="user-icon" />
       <div className="message__text information">
         <p className="information__header header">
-          <span className="header__name">{message.messageId}</span>
-          <span className="header__date">{message.messageDate}</span>
+          <span className="header__name">{message.userId}</span>
+          <span className="header__date">{message.messageDate.slice(11, 16)}</span>
         </p>
-        <p className="information__text">
-          <ReactMarkdown>{message.messageStr}</ReactMarkdown>
-        </p>
+        <ReactMarkdown className="information__text">{message.messageStr}</ReactMarkdown>
       </div>
     </div>
   )

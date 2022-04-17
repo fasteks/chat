@@ -11,7 +11,7 @@
   }
 
   &__messages {
-    max-height: 75vh;
+    max-height: 72vh;
     overflow-y: auto;
     padding: 0.5rem 1rem;
   }
@@ -71,9 +71,11 @@
 
   &__input {
     padding: 0.3rem 0.9rem;
+    overflow: hidden;
     border: 0.1rem solid black;
     border-radius: 0 0.5rem 0.5rem 0;
     outline: none;
+    resize: none;
 
     &:focus {
       outline: 0.15rem solid blue;

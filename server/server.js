@@ -86,7 +86,7 @@ const setMessage = (id, messageText) => {
     userId: id,
     messageId: shortid.generate(),
     messageStr: messageText,
-    messageDate: +new Date(),
+    messageDate: new Date(),
     meta: {}
   }
 }
