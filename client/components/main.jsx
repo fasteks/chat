@@ -10,6 +10,7 @@ import Message from './message'
 const Main = () => {
   const dispatch = useDispatch()
   const [message, setMessage] = useState('')
+  const [search, setSearch] = useState('')
   const { channels, currentChannel } = useSelector((s) => s.channels)
   const { id } = useSelector((s) => s.auth.user)
   const isChannel = currentChannel.length === 0
@@ -18,20 +19,30 @@ const Main = () => {
   const areMessages = messagesLength !== 0
 
   useEffect(() => {
-    document.querySelector('.main__messages').lastChild.scrollIntoView()
+    document.querySelector('.main__messages').lastChild?.scrollIntoView()
   }, [messagesLength])
 
   return (
     <div className="main flex flex-col justify-between grow">
-      <div className="main__header flex flex-wrap items-center justify-between">
-        <div className="header flex flex-col">
-          <h3 className="header__title">{currentChannel}</h3>
-          <p className="header__description">Chill chatting about everyting</p>
+      {!isChannel && (
+        <div className="main__header flex flex-wrap items-center justify-between">
+          <div className="header flex flex-col">
+            <h3 className="header__title">{currentChannel}</h3>
+            <p className="header__description">Chill chatting about everyting</p>
+          </div>
+          <div>
+            <input
+              type="text"
+              className="header__input"
+              placeholder="Search"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value)
+              }}
+            />
+          </div>
         </div>
-        <div>
-          <input type="text" className="header__input" placeholder="Search" />
-        </div>
-      </div>
+      )}
       <div className="main__messages flex flex-col grow">
         {isChannel && areChannels && (
           <p className="h-full flex flex-col items-center justify-center">Choose a channel!</p>
@@ -41,9 +52,15 @@ const Main = () => {
         )}
         {!isChannel &&
           areMessages &&
-          channels[currentChannel]?.messages.map((it) => {
-            return <Message key={it.messageId} message={it} />
-          })}
+          channels[currentChannel]?.messages
+            .map((it) => {
+              return <Message key={it.messageId} message={it} />
+            })
+            .filter((it) =>
+              search.length !== 0
+                ? it.props.message.messageStr.toLowerCase().includes(search.toLowerCase())
+                : it
+            )}
         {!isChannel && !areMessages && (
           <p className="h-full flex justify-center items-center">No one sent a message yet!</p>
         )}

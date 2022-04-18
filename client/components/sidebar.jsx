@@ -117,7 +117,6 @@ const Sidebar = () => {
       }) || <span className="hidden">&nbsp;</span>}
       <div className="sidebar__users flex flex-col">
         <h3 className="users__title">Direct Messages</h3>
-        <p>fasteks (me)</p>
         <p>Adam</p>
         <p>Olivia</p>
       </div>

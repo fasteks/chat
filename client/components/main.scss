@@ -1,5 +1,8 @@
 .main {
-  max-height: screen;
+  // max-height: screen;
+  min-height: min-content;
+  max-height: none;
+  min-width: min-content;
 
   font-size: large;
   color: black;
