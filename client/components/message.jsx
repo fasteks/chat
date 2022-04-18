@@ -5,7 +5,7 @@ import './message.scss'
 
 const Message = ({ message }) => {
   return (
-    <div className="message">
+    <div className="messages__message message">
       <img className="message__icon" src="images/such_wow.jpg" alt="user-icon" />
       <div className="message__text information">
         <p className="information__header header">

@@ -43,13 +43,9 @@ const Main = () => {
           </div>
         </div>
       )}
-      <div className="main__messages flex flex-col grow">
-        {isChannel && areChannels && (
-          <p className="h-full flex flex-col items-center justify-center">Choose a channel!</p>
-        )}
-        {isChannel && !areChannels && (
-          <p className="h-full flex flex-col items-center justify-center">Make a channel!</p>
-        )}
+      <div className="main__messages messages flex flex-col grow">
+        {isChannel && areChannels && <p className="messages__alert">Choose a channel!</p>}
+        {isChannel && !areChannels && <p className="messages__alert">Make a channel!</p>}
         {!isChannel &&
           areMessages &&
           channels[currentChannel]?.messages
@@ -58,7 +54,8 @@ const Main = () => {
             })
             .filter((it) =>
               search.length !== 0
-                ? it.props.message.messageStr.toLowerCase().includes(search.toLowerCase())
+                ? it.props.message.messageStr.toLowerCase().includes(search.toLowerCase()) ||
+                  it.props.message.userId.toLowerCase().includes(search.toLowerCase())
                 : it
             )}
         {!isChannel && !areMessages && (

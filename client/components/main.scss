@@ -17,6 +17,20 @@
     max-height: 72vh;
     overflow-y: auto;
     padding: 0.5rem 1rem;
+
+    .messages {
+      height: 100%;
+
+      &__alert {
+        margin: auto auto;
+        padding: 0.5rem;
+        background-color: rgba(238, 255, 0, 0.89);
+        border: 0.2rem solid rgb(255, 175, 2);
+        border-radius: 5%;
+        font-size: large;
+        font-weight: 600;
+      }
+    }
   }
 
   &__message {
@@ -65,7 +79,7 @@
     overflow: hidden;
     color: gray;
 
-    &:focus {
+    &:active {
       color: rgb(75, 75, 255);
       outline: 0.15rem solid blue;
       outline-offset: -0.1rem;
