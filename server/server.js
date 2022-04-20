@@ -105,6 +105,11 @@ server.post('/api/v1/channel/message', async (req, res) => {
   res.json(updatedChannels)
 })
 
+server.post('/api/v1/auth', async (req, res) => {
+  console.log(req.body)
+  res.json({ status: 'ok' })
+})
+
 server.use('/api/', (req, res) => {
   res.status(404)
   res.end()
