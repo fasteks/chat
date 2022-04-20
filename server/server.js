@@ -10,12 +10,15 @@ import cookieParser from 'cookie-parser'
 import shortid from 'shortid'
 
 import config from './config'
+import mongooseService from './services/mongoose'
 
 import Html from '../client/html'
 
 const { readFile, writeFile } = require('fs').promises
 
 require('colors')
+
+mongooseService.connect()
 
 let Root
 try {
