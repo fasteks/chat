@@ -82,6 +82,7 @@
         "babel-loader": "^8.2.3",
         "babel-plugin-css-modules-transform": "^1.6.2",
         "babel-polyfill": "^6.26.0",
+        "bcrypt-nodejs": "^0.0.3",
         "classnames": "^2.3.1",
         "colors": "^1.4.0",
         "connected-react-router": "^6.9.2",

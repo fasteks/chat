@@ -11,6 +11,7 @@ import shortid from 'shortid'
 
 import config from './config'
 import mongooseService from './services/mongoose'
+import User from './model/User.model'
 
 import Html from '../client/html'
 
@@ -19,6 +20,12 @@ const { readFile, writeFile } = require('fs').promises
 require('colors')
 
 mongooseService.connect()
+
+const user = new User({
+  email: 'test@gmail.com',
+  password: 'hello'
+})
+user.save()
 
 let Root
 try {
