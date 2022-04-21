@@ -1,13 +1,13 @@
 const passportJWT = require('passport-jwt')
 
 const User = require('../model/User.model')
-const config = require('../config')
+const config = require('../config').default
 
 const cookieExtractor = (req) => {
   return req && req.cookies && req.cookies.token
 }
 const jwtOptions = {
-  secretOrKey: config.default.secret,
+  secretOrKey: config.secret,
   jwtFromRequest: passportJWT.ExtractJwt.fromExtractors([cookieExtractor])
 }
 

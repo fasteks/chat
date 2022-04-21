@@ -12,12 +12,10 @@ import NotFound from '../components/404'
 import Startup from './startup'
 
 const OnlyAnonymousRoute = ({ component: Component, ...rest }) => {
-  const user = useSelector((state) => state.auth.user)
-  const token = useSelector((state) => state.token)
-  const func = (props) => {
-    if (!!user && !!user.name && !!token) <Redirect to={{ pathname: '/' }} />
-    return <Component {...props} />
-  }
+  const auth = useSelector((state) => state.auth)
+
+  const func = (props) =>
+    !!auth.user && !!auth.token ? <Redirect to={{ pathname: '/chat' }} /> : <Component {...props} />
   return <Route {...rest} render={func} />
 }
 
@@ -46,9 +44,7 @@ const RootComponent = (props) => {
         <Startup>
           <Switch>
             <Route exact path="/" component={LoginForm} />
-            {/* <Route exact path="/login" component={LoginForm} /> */}
-            {/* <Route exact path="/*" component={Home} /> */}
-            <PrivateRoute exact path="/private" component={Home} />
+            <PrivateRoute exact path="/chat" component={Home} />
             <OnlyAnonymousRoute exact path="/" component={LoginForm} />
             <Route component={NotFound} />
           </Switch>

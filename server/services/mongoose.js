@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const config = require('../config')
+const config = require('../config').default
 
 mongoose.connection.on('connected', () => {
   console.log('db is connected')
@@ -11,7 +11,7 @@ mongoose.connection.on('error', (err) => {
   process.exit(1)
 })
 
-exports.connect = async (mongoURL = config.default.mongoURL) => {
+exports.connect = async (mongoURL = config.mongoURL) => {
   mongoose.connect(mongoURL, {
     useUnifiedTopology: true,
     useNewUrlParser: true

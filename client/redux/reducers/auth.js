@@ -1,13 +1,15 @@
+import Cookies from 'universal-cookie'
 import { history } from '../index'
 
 const UPDATE_EMAIL = '@chat/auth/UPDATE_EMAIL'
 const UPDATE_PASSWORD = '@chat/auth/UPDATE_PASSWORD'
 const LOGIN = '@chat/auth/LOGIN'
 
+const cookies = new Cookies()
 const initialState = {
   email: '',
   password: '',
-  token: '',
+  token: cookies.get('token'),
   user: {
     // name: 'fasteks',
     // id: '28',
@@ -66,7 +68,18 @@ export function signIn() {
       .then((res) => res.json())
       .then((data) => {
         dispatch({ type: LOGIN, token: data.token, user: data.user, password: '' })
-        history.push('/private')
+        history.push('/chat')
+      })
+  }
+}
+
+export function trySignIn() {
+  return (dispatch) => {
+    fetch('/api/v1/auth')
+      .then((res) => res.json())
+      .then((data) => {
+        dispatch({ type: LOGIN, token: data.token, user: data.user, password: '' })
+        history.push('/chat')
       })
   }
 }

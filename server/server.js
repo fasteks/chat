@@ -114,12 +114,29 @@ server.post('/api/v1/channel/message', async (req, res) => {
   res.json(updatedChannels)
 })
 
+server.get('/api/v1/auth', async (req, res) => {
+  try {
+    const jwtUser = jwt.verify(req.cookies.token, config.secret)
+    const user = await User.findById(jwtUser.uid)
+
+    const payload = { uid: user.id }
+    const token = jwt.sign(payload, config.secret, { expiresIn: '48h' })
+    delete user.password
+    res.cookie('token', token, { maxAge: 1000 * 60 * 60 * 48 })
+    res.json({ status: 'ok', token, user })
+  } catch (err) {
+    console.log(err)
+    res.json({ status: 'error', err })
+  }
+})
+
 server.post('/api/v1/auth', async (req, res) => {
   try {
     const user = await User.findAndValidateUser(req.body)
     const payload = { uid: user.id }
     delete user.password
     const token = jwt.sign(payload, config.secret, { expiresIn: '48h' })
+    res.cookie('token', token, { maxAge: 1000 * 60 * 60 * 48 })
     res.json({ status: 'ok', token, user })
   } catch (err) {
     res.json({ status: 'error', err })

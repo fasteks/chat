@@ -16,7 +16,7 @@ const Home = () => {
 
   return (
     <div className="min-h-screen">
-      <Head title="Home" />
+      <Head title="Main" />
       <div className="min-h-screen flex">
         <Sidebar />
         <Main />
