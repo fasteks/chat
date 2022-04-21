@@ -8,17 +8,21 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true
     },
-    password: {
-      type: String,
-      required: true
-    },
     role: {
       type: [String],
       default: ['user']
+    },
+    channels: {
+      type: [String],
+      default: []
+    },
+    password: {
+      type: String,
+      required: true
     }
   },
   {
-    timestamps: true
+    timestamp: true
   }
 )
 
@@ -46,17 +50,20 @@ userSchema.statics = {
     if (!password) {
       throw new Error('No Password')
     }
+
     const user = await this.findOne({ email }).exec()
     if (!user) {
-      throw new Error('No such User')
+      throw new Error('No User')
     }
+
     const isPasswordOk = await user.passwordMatches(password)
+
     if (!isPasswordOk) {
-      throw new Error('Password Incorrect')
+      throw new Error('PasswordIncorrect')
     }
 
     return user
   }
-}
 
+}
 export default mongoose.model('users', userSchema)

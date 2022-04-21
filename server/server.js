@@ -14,6 +14,7 @@ import config from './config'
 import mongooseService from './services/mongoose'
 import passportJWT from './services/passport'
 import User from './model/User.model'
+import auth from './middleware/auth'
 
 import Html from '../client/html'
 
@@ -114,6 +115,10 @@ server.post('/api/v1/channel/message', async (req, res) => {
   res.json(updatedChannels)
 })
 
+server.get('/api/v1/user-info', auth([]), (req, res) => {
+  res.json({ status: '123' })
+})
+
 server.get('/api/v1/auth', async (req, res) => {
   try {
     const jwtUser = jwt.verify(req.cookies.token, config.secret)
@@ -141,6 +146,10 @@ server.post('/api/v1/auth', async (req, res) => {
   } catch (err) {
     res.json({ status: 'error', err })
   }
+})
+
+server.get('/api/v1/user-info', auth([]), (req, res) => {
+  res.json({ status: '123' })
 })
 
 server.use('/api/', (req, res) => {
