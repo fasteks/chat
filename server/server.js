@@ -6,11 +6,13 @@ import { renderToStaticNodeStream } from 'react-dom/server'
 import React from 'react'
 
 import cookieParser from 'cookie-parser'
-
 import shortid from 'shortid'
+import passport from 'passport'
+import jwt from 'jsonwebtoken'
 
 import config from './config'
 import mongooseService from './services/mongoose'
+import passportJWT from './services/passport'
 import User from './model/User.model'
 
 import Html from '../client/html'
@@ -20,12 +22,6 @@ const { readFile, writeFile } = require('fs').promises
 require('colors')
 
 mongooseService.connect()
-
-const user = new User({
-  email: 'test@gmail.com',
-  password: 'hello'
-})
-user.save()
 
 let Root
 try {
@@ -42,11 +38,14 @@ const server = express()
 
 const middleware = [
   cors(),
+  passport.initialize(),
   express.static(path.resolve(__dirname, '../dist/assets')),
   express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }),
   express.json({ limit: '50mb', extended: true }),
   cookieParser()
 ]
+
+passport.use('jwt', passportJWT.jwt)
 
 middleware.forEach((it) => server.use(it))
 
@@ -116,8 +115,14 @@ server.post('/api/v1/channel/message', async (req, res) => {
 })
 
 server.post('/api/v1/auth', async (req, res) => {
-  console.log(req.body)
-  res.json({ status: 'ok' })
+  try {
+    const user = await User.findAndValidateUser(req.body)
+    const payload = { uid: user.id }
+    const token = jwt.sign(payload, config.secret, { expiresIn: '48h' })
+    res.json({ status: 'ok', token })
+  } catch (err) {
+    res.json({ status: 'error', err })
+  }
 })
 
 server.use('/api/', (req, res) => {

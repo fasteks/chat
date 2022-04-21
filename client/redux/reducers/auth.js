@@ -1,9 +1,9 @@
-const UPDATE_LOGIN = '@chat/auth/UPDATE_LOGIN'
+const UPDATE_EMAIL = '@chat/auth/UPDATE_EMAIL'
 const UPDATE_PASSWORD = '@chat/auth/UPDATE_PASSWORD'
 const LOGIN = '@chat/auth/LOGIN'
 
 const initialState = {
-  login: '',
+  email: '',
   password: '',
   token: '',
   user: {
@@ -15,10 +15,10 @@ const initialState = {
 
 export default (state = initialState, action = {}) => {
   switch (action.type) {
-    case UPDATE_LOGIN: {
+    case UPDATE_EMAIL: {
       return {
         ...state,
-        login: action.login
+        email: action.email
       }
     }
     case UPDATE_PASSWORD: {
@@ -38,8 +38,8 @@ export default (state = initialState, action = {}) => {
   }
 }
 
-export function updateLoginField(login) {
-  return { type: UPDATE_LOGIN, login }
+export function updateLoginField(email) {
+  return { type: UPDATE_EMAIL, email }
 }
 
 export function updatePasswordField(password) {
@@ -48,14 +48,14 @@ export function updatePasswordField(password) {
 
 export function signIn() {
   return (dispatch, getState) => {
-    const { login, password } = getState().auth
+    const { email, password } = getState().auth
     fetch('/api/v1/auth', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        login,
+        email,
         password
       })
     })
