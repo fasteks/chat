@@ -64,6 +64,6 @@ userSchema.statics = {
 
     return user
   }
-
 }
+
 export default mongoose.model('users', userSchema)
