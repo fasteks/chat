@@ -22,20 +22,17 @@ const OnlyAnonymousRoute = ({ component: Component, ...rest }) => {
 }
 
 const PrivateRoute = ({ component: Component, ...rest }) => {
-  const user = useSelector((state) => state.auth.user)
-  const token = useSelector((state) => state.token)
-
-  const func = (props) => {
-    if (!!user && !!user.name && !!token) return <Component {...props} />
-
-    return (
+  const auth = useSelector((s) => s.auth)
+  const func = (props) =>
+    !!auth.user && !!auth.token ? (
+      <Component {...props} />
+    ) : (
       <Redirect
         to={{
-          pathname: '/login'
+          pathname: '/'
         }}
       />
     )
-  }
   return <Route {...rest} render={func} />
 }
 
@@ -49,9 +46,10 @@ const RootComponent = (props) => {
         <Startup>
           <Switch>
             <Route exact path="/" component={LoginForm} />
-            <Route exact path="/*" component={Home} />
-            <PrivateRoute exact path="/hidden-route" component={Home} />
-            <OnlyAnonymousRoute exact path="/anonymous-route" component={Home} />
+            {/* <Route exact path="/login" component={LoginForm} /> */}
+            {/* <Route exact path="/*" component={Home} /> */}
+            <PrivateRoute exact path="/private" component={Home} />
+            <OnlyAnonymousRoute exact path="/" component={LoginForm} />
             <Route component={NotFound} />
           </Switch>
         </Startup>

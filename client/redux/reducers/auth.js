@@ -1,3 +1,5 @@
+import { history } from '../index'
+
 const UPDATE_EMAIL = '@chat/auth/UPDATE_EMAIL'
 const UPDATE_PASSWORD = '@chat/auth/UPDATE_PASSWORD'
 const LOGIN = '@chat/auth/LOGIN'
@@ -7,9 +9,9 @@ const initialState = {
   password: '',
   token: '',
   user: {
-    name: 'fasteks',
-    id: '28',
-    isOnline: true
+    // name: 'fasteks',
+    // id: '28',
+    // isOnline: true
   }
 }
 
@@ -30,7 +32,9 @@ export default (state = initialState, action = {}) => {
     case LOGIN: {
       return {
         ...state,
-        token: action.password
+        token: action.token,
+        user: action.user,
+        password: action.password
       }
     }
     default:
@@ -59,9 +63,10 @@ export function signIn() {
         password
       })
     })
-      .then((res) => res.json)
+      .then((res) => res.json())
       .then((data) => {
-        dispatch({ type: LOGIN, token: data.token })
+        dispatch({ type: LOGIN, token: data.token, user: data.user, password: '' })
+        history.push('/private')
       })
   }
 }
