@@ -27,7 +27,7 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
     ) : (
       <Redirect
         to={{
-          pathname: '/'
+          pathname: '/login'
         }}
       />
     )
@@ -43,9 +43,9 @@ const RootComponent = (props) => {
       <RouterSelector history={history} location={props.location} context={props.context}>
         <Startup>
           <Switch>
+            <OnlyAnonymousRoute exact path="/login" component={LoginForm} />
             <Route exact path="/" component={LoginForm} />
             <PrivateRoute exact path="/chat" component={Home} />
-            <OnlyAnonymousRoute exact path="/" component={LoginForm} />
             <Route component={NotFound} />
           </Switch>
         </Startup>

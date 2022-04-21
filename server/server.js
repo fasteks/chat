@@ -51,6 +51,40 @@ passport.use('jwt', passportJWT.jwt)
 
 middleware.forEach((it) => server.use(it))
 
+server.get('/api/v1/user-info', auth([]), (req, res) => {
+  res.json({ status: '123' })
+})
+
+server.get('/api/v1/auth', async (req, res) => {
+  try {
+    const jwtUser = jwt.verify(req.cookies.token, config.secret)
+    const user = await User.findById(jwtUser.uid)
+
+    const payload = { uid: user.id }
+    const token = jwt.sign(payload, config.secret, { expiresIn: '48h' })
+    delete user.password
+    res.cookie('token', token, { maxAge: 1000 * 60 * 60 * 48 })
+    res.json({ status: 'ok', token, user })
+  } catch (err) {
+    // eslint-disable-next-line
+    console.log(err)
+    res.json({ status: 'error', err })
+  }
+})
+
+server.post('/api/v1/auth', async (req, res) => {
+  try {
+    const user = await User.findAndValidateUser(req.body)
+    const payload = { uid: user.id }
+    delete user.password
+    const token = jwt.sign(payload, config.secret, { expiresIn: '48h' })
+    res.cookie('token', token, { maxAge: 1000 * 60 * 60 * 48 })
+    res.json({ status: 'ok', token, user })
+  } catch (err) {
+    res.json({ status: 'error', err })
+  }
+})
+
 const getChannels = () => {
   return readFile(`${__dirname}/data/channels.json`, 'utf-8')
     .then((string) => {
@@ -114,44 +148,6 @@ server.post('/api/v1/channel/message', async (req, res) => {
   }
   await writeFile(`${__dirname}/data/channels.json`, JSON.stringify(updatedChannels), 'utf-8')
   res.json(updatedChannels)
-})
-
-server.get('/api/v1/user-info', auth([]), (req, res) => {
-  res.json({ status: '123' })
-})
-
-server.get('/api/v1/auth', async (req, res) => {
-  try {
-    const jwtUser = jwt.verify(req.cookies.token, config.secret)
-    const user = await User.findById(jwtUser.uid)
-
-    const payload = { uid: user.id }
-    const token = jwt.sign(payload, config.secret, { expiresIn: '48h' })
-    delete user.password
-    res.cookie('token', token, { maxAge: 1000 * 60 * 60 * 48 })
-    res.json({ status: 'ok', token, user })
-  } catch (err) {
-    // eslint-disable-next-line
-    console.log(err)
-    res.json({ status: 'error', err })
-  }
-})
-
-server.post('/api/v1/auth', async (req, res) => {
-  try {
-    const user = await User.findAndValidateUser(req.body)
-    const payload = { uid: user.id }
-    delete user.password
-    const token = jwt.sign(payload, config.secret, { expiresIn: '48h' })
-    res.cookie('token', token, { maxAge: 1000 * 60 * 60 * 48 })
-    res.json({ status: 'ok', token, user })
-  } catch (err) {
-    res.json({ status: 'error', err })
-  }
-})
-
-server.get('/api/v1/user-info', auth([]), (req, res) => {
-  res.json({ status: '123' })
 })
 
 server.use('/api/', (req, res) => {

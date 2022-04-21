@@ -12,10 +12,6 @@ const userSchema = new mongoose.Schema(
       type: [String],
       default: ['user']
     },
-    channels: {
-      type: [String],
-      default: []
-    },
     password: {
       type: String,
       required: true

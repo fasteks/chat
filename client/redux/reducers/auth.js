@@ -10,11 +10,12 @@ const initialState = {
   email: '',
   password: '',
   token: cookies.get('token'),
-  user: {
-    // name: 'fasteks',
-    // id: '28',
-    // isOnline: true
-  }
+  user: {}
+  // user: {
+  //   name: 'fasteks',
+  //   id: '28',
+  //   isOnline: true
+  // }
 }
 
 export default (state = initialState, action = {}) => {
