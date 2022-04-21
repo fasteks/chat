@@ -89,6 +89,7 @@ export function tryGetUserInfo() {
     fetch('/api/v1/user-info')
       .then((res) => res.json())
       .then((data) => {
+        // eslint-disable-next-line
         console.log(data)
       })
   }

@@ -29,6 +29,7 @@ try {
   // eslint-disable-next-line import/no-unresolved
   Root = require('../dist/assets/js/ssr/root.bundle').default
 } catch {
+  // eslint-disable-next-line
   console.log('SSR not found. Please run "yarn run build:ssr"'.red)
 }
 
@@ -130,6 +131,7 @@ server.get('/api/v1/auth', async (req, res) => {
     res.cookie('token', token, { maxAge: 1000 * 60 * 60 * 48 })
     res.json({ status: 'ok', token, user })
   } catch (err) {
+    // eslint-disable-next-line
     console.log(err)
     res.json({ status: 'error', err })
   }
@@ -196,4 +198,5 @@ if (config.isSocketsEnabled) {
   })
   echo.installHandlers(app, { prefix: '/ws' })
 }
+// eslint-disable-next-line
 console.log(`Serving at http://localhost:${port}`)
