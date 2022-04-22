@@ -14,6 +14,7 @@ import config from './config'
 import mongooseService from './services/mongoose'
 import passportJWT from './services/passport'
 import User from './model/User.model'
+// import Kitten from './model/Kitten.model'
 import auth from './middleware/auth'
 
 import Html from '../client/html'
@@ -51,23 +52,23 @@ passport.use('jwt', passportJWT.jwt)
 
 middleware.forEach((it) => server.use(it))
 
-server.get('/api/v1/user-info', auth([]), (req, res) => {
+// Kitten.find({}).then(it => console.log(it.map(e => e.speak())))
+
+server.get('/api/v1/user-info', auth([]), async (req, res) => {
   res.json({ status: '123' })
 })
 
+// User.find({}).then(s => console.log(s))
 server.get('/api/v1/auth', async (req, res) => {
   try {
     const jwtUser = jwt.verify(req.cookies.token, config.secret)
     const user = await User.findById(jwtUser.uid)
-
     const payload = { uid: user.id }
     const token = jwt.sign(payload, config.secret, { expiresIn: '48h' })
     delete user.password
     res.cookie('token', token, { maxAge: 1000 * 60 * 60 * 48 })
     res.json({ status: 'ok', token, user })
   } catch (err) {
-    // eslint-disable-next-line
-    console.log(err)
     res.json({ status: 'error', err })
   }
 })

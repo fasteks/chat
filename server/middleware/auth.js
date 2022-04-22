@@ -6,6 +6,8 @@ const handleJWT = (req, res, next, roles) => {
 
     if (error || !user) return res.status(401).json({ status: 401, ...err })
     await req.logIn(user, { session: false })
+
+    // eslint-disable-next-line
     console.log(user.role, roles)
 
     if (!roles.reduce((acc, rec) => acc && user.role.some((t) => t === rec), true)) {

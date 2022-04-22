@@ -14,6 +14,9 @@ mongoose.connection.on('error', (err) => {
   process.exit(1)
 })
 
+// same as if we write
+// exports default async (mongoURL = config.mongoURL) => {
+// it's just writes connect func into exports obj of whole mongoose.js file
 exports.connect = async (mongoURL = config.mongoURL) => {
   mongoose.connect(mongoURL, {
     useUnifiedTopology: true,
