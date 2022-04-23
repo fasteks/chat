@@ -13,6 +13,7 @@ const cookieExtractor = (req) => {
   return req && req.cookies && req.cookies.token
 }
 
+// содержит параметры для управления тем, как токен извлекается из запроса или ?проверяется?.
 const jwtOptions = {
   secretOrKey: config.secret,
   // набор ф. для получения токена, в данном случае из кукисов
@@ -21,7 +22,7 @@ const jwtOptions = {
 
 // стратегия находит пользователя в бд, говорит зарегистрирован он или нет и расширяет его как-то?
 // зная содержимое jwt tokena как найти пользователя
-// (как правило, прячем туда userId)        payload = ---.вторая часть jwt токена.---
+// (как правило, прячем туда userId)      jwtpayload = ---.вторая часть jwt токена.---
 const jwtStrategy = new passportJWT.Strategy(jwtOptions, (jwtPayload, done) => {
   //                       done = значит ф. выполнилась и пользователь есть
   User.findById(jwtPayload.uid, (err, user) => {

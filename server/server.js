@@ -42,6 +42,8 @@ const server = express()
 
 const middleware = [
   cors(),
+  // Passport is an authentication middleware for Node that authenticates requests.
+  // So basically passport.initialize() initialises the authentication module.
   passport.initialize(),
   express.static(path.resolve(__dirname, '../dist/assets')),
   express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }),
