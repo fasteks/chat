@@ -9,14 +9,15 @@ import cookieParser from 'cookie-parser'
 import shortid from 'shortid'
 
 import passport from 'passport'
-import jwt from 'jsonwebtoken'
+// import jwt from 'jsonwebtoken'
 
 import config from './config'
 import mongooseService from './services/mongoose'
 import passportJWT from './services/passport'
-import User from './model/User.model'
-// import Kitten from './model/Kitten.model'
+// import User from './model/User.model'
 import auth from './middleware/auth'
+// import Kitten from './model/Kitten.model'
+import authRoute from './routes/auth.route'
 
 import Html from '../client/html'
 
@@ -51,45 +52,53 @@ const middleware = [
   cookieParser()
 ]
 
-passport.use('jwt', passportJWT.jwt)
 
+// Для того чтобы загрузить функцию промежуточного обработчика
+// вызовите app.use() с указанием соответствующей функции
+// ?получается? каждый раз при получении запроса приложение будет запускать мидлвэр
 middleware.forEach((it) => server.use(it))
 
+passport.use('jwt', passportJWT.jwt)
 // Kitten.find({}).then(it => console.log(it.map(e => e.speak())))
 
 server.get('/api/v1/user-info', auth([]), async (req, res) => {
   res.json({ status: '123' })
 })
 
-server.get('/api/v1/auth', async (req, res) => {
-  try {
-    const jwtUser = jwt.verify(req.cookies.token, config.secret)
-    const user = await User.findById(jwtUser.uid)
-    const payload = { uid: user.id }
-    const token = jwt.sign(payload, config.secret, { expiresIn: '48h' })
-    delete user.password
-    res.cookie('token', token, { maxAge: 1000 * 60 * 60 * 48 })
-    res.json({ status: 'ok', token, user })
-  } catch (err) {
-    res.json({ status: 'error', err })
-  }
-})
+// Данное приложение теперь может обрабатывать запросы, адресованные на api/v1/auth
+// если большой проект с кучей роутов, этот файл будет целой простыней текста
+// вынесли функции для лучшей струтурированность/читаемости в отдельный файл
+server.use('/api/v1/auth', authRoute)
 
-// для успешной авторизации необходимо добавить токен
-// для этого нужно расширить api для бд
+// server.get('/api/v1/auth', async (req, res) => {
+//   try {
+//     const jwtUser = jwt.verify(req.cookies.token, config.secret)
+//     const user = await User.findById(jwtUser.uid)
+//     const payload = { uid: user.id }
+//     const token = jwt.sign(payload, config.secret, { expiresIn: '48h' })
+//     delete user.password
+//     res.cookie('token', token, { maxAge: 1000 * 60 * 60 * 48 })
+//     res.json({ status: 'ok', token, user })
+//   } catch (err) {
+//     res.json({ status: 'error', err })
+//   }
+// })
 
-server.post('/api/v1/auth', async (req, res) => {
-  try {
-    const user = await User.findAndValidateUser(req.body)
-    const payload = { uid: user.id }
-    delete user.password
-    const token = jwt.sign(payload, config.secret, { expiresIn: '48h' })
-    res.cookie('token', token, { maxAge: 1000 * 60 * 60 * 48 })
-    res.json({ status: 'ok', token, user })
-  } catch (err) {
-    res.json({ status: 'error', err })
-  }
-})
+// // для успешной авторизации необходимо добавить токен
+// // для этого нужно расширить api для бд
+
+// server.post('/api/v1/auth', async (req, res) => {
+//   try {
+//     const user = await User.findAndValidateUser(req.body)
+//     const payload = { uid: user.id }
+//     delete user.password
+//     const token = jwt.sign(payload, config.secret, { expiresIn: '48h' })
+//     res.cookie('token', token, { maxAge: 1000 * 60 * 60 * 48 })
+//     res.json({ status: 'ok', token, user })
+//   } catch (err) {
+//     res.json({ status: 'error', err })
+//   }
+// })
 
 const getChannels = () => {
   return readFile(`${__dirname}/data/channels.json`, 'utf-8')

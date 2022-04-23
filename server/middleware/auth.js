@@ -13,7 +13,7 @@ const handleJWT = (req, res, next, roles) => {
     await req.logIn(user, { session: false })
 
     // eslint-disable-next-line
-    console.log(user.role, roles)
+    // console.log(user.role, roles)
 
     // see if user is authorized to do the action
     if (!roles.reduce((acc, rec) => acc && user.role.some((t) => t === rec), true)) {
@@ -32,7 +32,7 @@ const auth =
   (req, res, next) => {
     return passport.authenticate(
       'jwt',
-      // session: false = не сохраняй никакие данные о текущем логине в сессии
+      // session: false = не сохраняет никакие данные о текущем логине в сессии
       {
         session: true
       },
