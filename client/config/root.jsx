@@ -43,9 +43,9 @@ const RootComponent = (props) => {
       <RouterSelector history={history} location={props.location} context={props.context}>
         <Startup>
           <Switch>
+            <PrivateRoute exact path="/chat" component={Home} />
             <OnlyAnonymousRoute exact path="/login" component={LoginForm} />
             <Route exact path="/" component={LoginForm} />
-            <PrivateRoute exact path="/chat" component={Home} />
             <Route component={NotFound} />
           </Switch>
         </Startup>

@@ -6,6 +6,7 @@ const UPDATE_PASSWORD = '@chat/auth/UPDATE_PASSWORD'
 const LOGIN = '@chat/auth/LOGIN'
 
 const cookies = new Cookies()
+
 const initialState = {
   email: '',
   password: '',

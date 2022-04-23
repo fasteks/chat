@@ -22,20 +22,40 @@ const userSchema = new mongoose.Schema(
   }
 )
 
-//  мидлвэр применяемое к документам выбранной коллекции
-// eslint-disable-next-line
-userSchema.pre('save', async function (next) {
-  //  this - указатель на текущий документ({}) выбранной коллекции
-  //  isModified универсальный прототип что может быть вызван на
-  //  на каждом документе ({}) в принципе (вне зависимости от принадлежности к коллекции)
-  if (!this.isModified('password')) {
+// из лехиного вебинара по авторизации, его реальный код какого-то приложения
+userSchema.pre('save', async function save(next) {
+  try {
+    if (!this.isModified('password')) {
+      return next()
+    }
+
+    this.password = bcrypt.hashSync(this.password)
+
     return next()
+  } catch (error) {
+    return next(error)
   }
-
-  this.password = bcrypt.hashSync(this.password)
-
-  return next()
 })
+
+// //  мидлвэр применяемое к документам выбранной коллекции
+// // eslint-disable-next-line
+// userSchema.pre('save', async function (next) {
+//   //  this - указатель на текущий документ({}) выбранной коллекции
+//   //  isModified универсальный прототип что может быть вызван на
+//   //  на каждом документе ({}) в принципе (вне зависимости от принадлежности к коллекции)
+//   if (!this.isModified('password')) {
+//     return next()
+//   }
+
+//   this.password = bcrypt.hashSync(this.password)
+
+//   return next()
+// })
+
+// далее 2 разновидности объявления/присвоения функций документу({}) и модели(коллекции)
+// идущих последовательно соотвественно (способы евивалетны по сути)
+// можно записовать как в method, так и в methods и т.д.
+// если в метод то запись нового метода - method({}), если в объект всех методов - methods = ({})
 
 //  прототип может быть вызван на всех "документах"(объектах коллекции(модели) {})
 //  конкретной колекции (в данном случае колекции юзеров)!
@@ -45,6 +65,8 @@ userSchema.methods = {
     return bcrypt.compareSync(password, this.password)
   }
 }
+
+//  (намного удобнее чем проверять конкретно в рутах (с) леха)
 //  прототип может быть вызван на конкретной колекции(модели) (в данном случае юзеров)
 userSchema.static({
   async findAndValidateUser({ email, password }) {

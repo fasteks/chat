@@ -7,6 +7,7 @@ import React from 'react'
 
 import cookieParser from 'cookie-parser'
 import shortid from 'shortid'
+
 import passport from 'passport'
 import jwt from 'jsonwebtoken'
 
@@ -58,7 +59,6 @@ server.get('/api/v1/user-info', auth([]), async (req, res) => {
   res.json({ status: '123' })
 })
 
-// User.find({}).then(s => console.log(s))
 server.get('/api/v1/auth', async (req, res) => {
   try {
     const jwtUser = jwt.verify(req.cookies.token, config.secret)
@@ -72,6 +72,9 @@ server.get('/api/v1/auth', async (req, res) => {
     res.json({ status: 'error', err })
   }
 })
+
+// для успешной авторизации необходимо добавить токен
+// для этого нужно расширить api для бд
 
 server.post('/api/v1/auth', async (req, res) => {
   try {
