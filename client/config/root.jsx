@@ -8,6 +8,7 @@ import store, { history } from '../redux'
 import Home from '../components/home'
 import LoginForm from '../components/login'
 import NotFound from '../components/404'
+import Admin from '../components/admin'
 
 import Startup from './startup'
 
@@ -21,16 +22,37 @@ const OnlyAnonymousRoute = ({ component: Component, ...rest }) => {
 
 const PrivateRoute = ({ component: Component, ...rest }) => {
   const auth = useSelector((s) => s.auth)
-  const func = (props) =>
-    !!auth.user && !!auth.token ? (
-      <Component {...props} />
-    ) : (
+
+  const func = (props) => {
+    if (!!auth.user && !!auth.token) {
+      return <Component {...props} />
+    }
+    return (
       <Redirect
         to={{
           pathname: '/login'
         }}
       />
     )
+  }
+  return <Route {...rest} render={func} />
+}
+
+const PrivateRouteAdmin = ({ component: Component, ...rest }) => {
+  const auth = useSelector((s) => s.auth)
+
+  const func = (props) => {
+    if (!!auth.user && !!auth.token && auth.user?.role?.includes('admin')) {
+      return <Component {...props} />
+    }
+    return (
+      <Redirect
+        to={{
+          pathname: '/chat'
+        }}
+      />
+    )
+  }
   return <Route {...rest} render={func} />
 }
 
@@ -43,6 +65,7 @@ const RootComponent = (props) => {
       <RouterSelector history={history} location={props.location} context={props.context}>
         <Startup>
           <Switch>
+            <PrivateRouteAdmin exact path="/admin" component={Admin} />
             <PrivateRoute exact path="/chat" component={Home} />
             <OnlyAnonymousRoute exact path="/login" component={LoginForm} />
             <Route exact path="/" component={LoginForm} />

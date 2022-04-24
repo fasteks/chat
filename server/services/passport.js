@@ -2,6 +2,8 @@
 // passport-jwt совмещает модуль для работы с jwt и вышеуказанный модуль
 // т.е. добавляет функциональность проверки jwt token-a на сервере без нашего непосредственного участия
 
+// passport-jwt - одна из множества возможных стратегий
+// данный же файл, описывает её, как надо нам
 // eslint-disable-next-line
 import passportJWT from 'passport-jwt'
 // eslint-disable-next-line
@@ -20,6 +22,7 @@ const jwtOptions = {
   jwtFromRequest: passportJWT.ExtractJwt.fromExtractors([cookieExtractor])
 }
 
+// function is responsible for determining the user to which the username(id for our instance) belongs
 // стратегия находит пользователя в бд, говорит зарегистрирован он или нет и расширяет его как-то?
 // зная содержимое jwt tokena как найти пользователя
 // (как правило, прячем туда userId)      jwtpayload = ---.вторая часть jwt токена.---
@@ -32,7 +35,7 @@ const jwtStrategy = new passportJWT.Strategy(jwtOptions, (jwtPayload, done) => {
       return done(err, null)
     }
     // если ошибки нет, на первом месте null
-    // если ошибки нет, на втором данные
+    // если ошибки нет, на втором данные пользователя
     if (user) {
       return done(null, user)
     }

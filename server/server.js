@@ -52,17 +52,28 @@ const middleware = [
   cookieParser()
 ]
 
-
 // Для того чтобы загрузить функцию промежуточного обработчика
 // вызовите app.use() с указанием соответствующей функции
-// ?получается? каждый раз при получении запроса приложение будет запускать мидлвэр
+// КАЖДЫЙ раз при получении запроса приложение будет запускать весь следующий мидлвэр!
 middleware.forEach((it) => server.use(it))
+// эквивалентная запись либо app.use(r1, r2) и пр.
+// server.use(middleware)
 
+// In cases where there is a naming conflict, or the default name is not sufficiently descriptive,
+// the name can be overridden when registering the strategy by passing a name as the first argument to .use():
+// регистрация стратегии под именем 'jwt' в "поле видимости" библиотеки passport
 passport.use('jwt', passportJWT.jwt)
+
 // Kitten.find({}).then(it => console.log(it.map(e => e.speak())))
 
-server.get('/api/v1/user-info', auth([]), async (req, res) => {
-  res.json({ status: '123' })
+// вынесли использование мидлвэр аутентификации пользователя auth в отдельный файл,
+// чтоб не раздувать server.js, а тут его применяем, к выбранному нами запросу
+// по логике: стратегия помогает найти пользователя где-то,
+// а вот обработать его содержимое под наши нужды (разрешить/запретить переход по пути)
+// уже делает auth middleware
+// passportJWT ищет user по token, auth обрабатывает содержимое user
+server.get('/api/v1/user-info', auth([]), (req, res) => {
+  res.json('777')
 })
 
 // Данное приложение теперь может обрабатывать запросы, адресованные на api/v1/auth

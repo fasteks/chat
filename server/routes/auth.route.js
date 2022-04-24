@@ -1,13 +1,14 @@
+// A router object is an isolated instance(module) of middleware and routes.
 // С помощью класса express.Router можно создавать модульные, монтируемые обработчики маршрутов
-// router as a module
 // обработчик схожих роутов в отдельно вынесенном модуле
 // компоновка роутов api/v1/auth в одном месте
 // по аналогии можно делать так же и для всех иных возможных крупных api
 
 import express from 'express'
 import jwt from 'jsonwebtoken'
-import User from '../model/User.model'
+
 import config from '../config'
+import User from '../model/User.model'
 
 const router = express.Router()
 
@@ -26,11 +27,12 @@ const router = express.Router()
 
 router.get('/', async (req, res) => {
   try {
+    //  jwt занимается конкретно проверкой токена "на подлинность" получается
     const jwtUser = jwt.verify(req.cookies.token, config.secret)
     const user = await User.findById(jwtUser.uid)
     const payload = { uid: user.id }
+    user.password = undefined
     const token = jwt.sign(payload, config.secret, { expiresIn: '48h' })
-    delete user.password
     res.cookie('token', token, { maxAge: 1000 * 60 * 60 * 48 })
     res.json({ status: 'ok', token, user })
   } catch (err) {
@@ -45,7 +47,7 @@ router.post('/', async (req, res) => {
   try {
     const user = await User.findAndValidateUser(req.body)
     const payload = { uid: user.id }
-    delete user.password
+    user.password = undefined
     const token = jwt.sign(payload, config.secret, { expiresIn: '48h' })
     res.cookie('token', token, { maxAge: 1000 * 60 * 60 * 48 })
     res.json({ status: 'ok', token, user })

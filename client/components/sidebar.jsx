@@ -9,6 +9,7 @@ import classnames from 'classnames'
 import './sidebar.scss'
 
 import { addChannel, channelLogin, channelLogout, switchChannel } from '../redux/reducers/channels'
+import { history } from '../redux'
 
 const Sidebar = () => {
   const dispatch = useDispatch()
@@ -23,6 +24,15 @@ const Sidebar = () => {
     <div className="sidebar flex flex-col">
       <h2 className="sidebar__title flex items-center justify-between">
         Chat
+        <button
+          type="button"
+          onClick={() => {
+            fetch('/api/v1/user-info')
+            history.push('/admin')
+          }}
+        >
+          admin
+        </button>
         <button type="button">
           {bell && <FontAwesomeIcon icon={faBell} onClick={() => setBell(!bell)} />}
           {!bell && <FontAwesomeIcon icon={faBellSlash} onClick={() => setBell(!bell)} />}

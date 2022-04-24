@@ -1,9 +1,11 @@
-// проверяет должен ли юзер иметь доступ к определенным роутам или нет
+// суть файла = passport.authenticate - это middleware!
+// которым будет обработан запрос на котором middleware вызвыается,
+// (т.е. не все подряд запросы, а только в данном случае требующие аутентификации)
 
 import passport from 'passport'
 
 // обработчик токена
-// каким ролям доступ к этим рутам
+// проверяет имеет ли юзер роли позволяющие получать доступ к определенным роутам или нет
 const handleJWT = (req, res, next, roles) => {
   return async (err, user, info) => {
     const error = err || info
@@ -11,9 +13,6 @@ const handleJWT = (req, res, next, roles) => {
     if (error || !user) return res.status(401).json({ status: 401, ...error })
 
     await req.logIn(user, { session: false })
-
-    // eslint-disable-next-line
-    // console.log(user.role, roles)
 
     // see if user is authorized to do the action
     if (!roles.reduce((acc, rec) => acc && user.role.some((t) => t === rec), true)) {
@@ -26,7 +25,7 @@ const handleJWT = (req, res, next, roles) => {
   }
 }
 
-// exports the middleware
+// функция берет стратегию авторизации 'jwt' и дополнительно обрабатывает запрос функцией handleJWT
 const auth =
   (roles = []) =>
   (req, res, next) => {
@@ -40,4 +39,5 @@ const auth =
     )(req, res, next)
   }
 
+// exports the middleware
 export default auth
