@@ -24,15 +24,6 @@ const Sidebar = () => {
     <div className="sidebar flex flex-col">
       <h2 className="sidebar__title flex items-center justify-between">
         Chat
-        <button
-          type="button"
-          onClick={() => {
-            fetch('/api/v1/user-info')
-            history.push('/admin')
-          }}
-        >
-          admin
-        </button>
         <button type="button">
           {bell && <FontAwesomeIcon icon={faBell} onClick={() => setBell(!bell)} />}
           {!bell && <FontAwesomeIcon icon={faBellSlash} onClick={() => setBell(!bell)} />}
@@ -131,6 +122,16 @@ const Sidebar = () => {
         <p>Olivia</p>
       </div>
       <h3 className="sidebar__applications">Applications</h3>
+      <button
+        type="button"
+        className="mt-auto text-sm text-blue-800"
+        onClick={() => {
+          fetch('/api/v1/user-info')
+          history.push('/admin')
+        }}
+      >
+        admin
+      </button>
     </div>
   )
 }
