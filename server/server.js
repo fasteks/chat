@@ -1,7 +1,6 @@
 import express from 'express'
 import path from 'path'
 import cors from 'cors'
-import sockjs from 'sockjs'
 import { renderToStaticNodeStream } from 'react-dom/server'
 import React from 'react'
 
@@ -9,7 +8,7 @@ import cookieParser from 'cookie-parser'
 import shortid from 'shortid'
 
 import passport from 'passport'
-// import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
 
 import config from './config'
 import mongooseService from './services/mongoose'
@@ -36,10 +35,8 @@ try {
   console.log('SSR not found. Please run "yarn run build:ssr"'.red)
 }
 
-let connections = []
-
 const port = process.env.PORT || 8090
-const server = express()
+const app = express()
 
 const middleware = [
   cors(),
@@ -56,9 +53,9 @@ const middleware = [
 // Для того чтобы загрузить функцию промежуточного обработчика
 // вызовите app.use() с указанием соответствующей функции
 // КАЖДЫЙ раз при получении запроса приложение будет запускать весь следующий мидлвэр!
-middleware.forEach((it) => server.use(it))
+middleware.forEach((it) => app.use(it))
 // эквивалентная запись либо app.use(r1, r2) и пр.
-// server.use(middleware)
+// app.use(middleware)
 
 // In cases where there is a naming conflict, or the default name is not sufficiently descriptive,
 // the name can be overridden when registering the strategy by passing a name as the first argument to .use():
@@ -73,16 +70,16 @@ passport.use('jwt', passportJWT.jwt)
 // а вот обработать его содержимое под наши нужды (разрешить/запретить переход по пути)
 // уже делает auth middleware
 // passportJWT ищет user по token, auth обрабатывает содержимое user
-server.get('/api/v1/user-info', auth(['admin']), (req, res) => {
+app.get('/api/v1/user-info', auth(['admin']), (req, res) => {
   res.json({ status: 'ok' })
 })
 
 // Данное приложение теперь может обрабатывать запросы, адресованные на api/v1/auth
 // если большой проект с кучей роутов, этот файл будет целой простыней текста
 // вынесли функции для лучшей струтурированность/читаемости в отдельный файл
-server.use('/api/v1/auth', authRoute)
+app.use('/api/v1/auth', authRoute)
 
-// server.get('/api/v1/auth', async (req, res) => {
+// app.get('/api/v1/auth', async (req, res) => {
 //   try {
 //     const jwtUser = jwt.verify(req.cookies.token, config.secret)
 //     const user = await User.findById(jwtUser.uid)
@@ -99,7 +96,7 @@ server.use('/api/v1/auth', authRoute)
 // // для успешной авторизации необходимо добавить токен
 // // для этого нужно расширить api для бд
 
-// server.post('/api/v1/auth', async (req, res) => {
+// app.post('/api/v1/auth', async (req, res) => {
 //   try {
 //     const user = await User.findAndValidateUser(req.body)
 //     const payload = { uid: user.id }
@@ -123,12 +120,12 @@ const getChannels = () => {
     })
 }
 
-server.get('/api/v1/channels', async (req, res) => {
+app.get('/api/v1/channels', async (req, res) => {
   const channels = await getChannels()
   res.json(channels)
 })
 
-server.post('/api/v1/channels', async (req, res) => {
+app.post('/api/v1/channels', async (req, res) => {
   const { title } = req.body
   const channels = await getChannels()
   const updatedChannels = { ...channels, [title]: { usersId: [], messages: [] } }
@@ -136,7 +133,7 @@ server.post('/api/v1/channels', async (req, res) => {
   res.json(updatedChannels)
 })
 
-server.post('/api/v1/channel', async (req, res) => {
+app.post('/api/v1/channel', async (req, res) => {
   const { id, channel, action } = req.body
   const channels = await getChannels()
   const updatedChannels = {
@@ -163,7 +160,7 @@ const setMessage = (id, messageText) => {
   }
 }
 
-server.post('/api/v1/channel/message', async (req, res) => {
+app.post('/api/v1/channel/message', async (req, res) => {
   const { currentChannel, id, message } = req.body
   const channels = await getChannels()
   const updatedChannels = {
@@ -177,7 +174,7 @@ server.post('/api/v1/channel/message', async (req, res) => {
   res.json(updatedChannels)
 })
 
-server.use('/api/', (req, res) => {
+app.use('/api/', (req, res) => {
   res.status(404)
   res.end()
 })
@@ -187,7 +184,7 @@ const [htmlStart, htmlEnd] = Html({
   title: 'Skillcrucial'
 }).split('separator')
 
-server.get('/', (req, res) => {
+app.get('/', (req, res) => {
   const appStream = renderToStaticNodeStream(<Root location={req.url} context={{}} />)
   res.write(htmlStart)
   appStream.pipe(res, { end: false })
@@ -197,7 +194,7 @@ server.get('/', (req, res) => {
   })
 })
 
-server.get('/*', (req, res) => {
+app.get('/*', (req, res) => {
   const appStream = renderToStaticNodeStream(<Root location={req.url} context={{}} />)
   res.write(htmlStart)
   appStream.pipe(res, { end: false })
@@ -207,19 +204,43 @@ server.get('/*', (req, res) => {
   })
 })
 
-const app = server.listen(port)
+const http = require('http')
 
-if (config.isSocketsEnabled) {
-  const echo = sockjs.createServer()
-  echo.on('connection', (conn) => {
-    connections.push(conn)
-    conn.on('data', async () => {})
+const server = http.createServer(app)
 
-    conn.on('close', () => {
-      connections = connections.filter((c) => c.readyState !== 3)
-    })
+const { Server } = require('socket.io')
+
+const io = new Server(server)
+
+let connections = []
+
+io.on('connection', (connection) => {
+  const user = jwt.verify(connection.handshake.auth.token, config.secret)
+  // eslint-disable-next-line
+  connection.userId = user.uid
+  connections.push(connection)
+  connection.emit('chatMessage', JSON.stringify({ message: 'hello world' }))
+
+  connection.on('disconnect', () => {
+    connections = connections.filter((it) => it.id !== connection.id)
   })
-  echo.installHandlers(app, { prefix: '/ws' })
-}
+})
+
+server.listen(port)
+
+// let connections = []
+// if (config.isSocketsEnabled) {
+//   const echo = sockjs.createServer()
+//   echo.on('connection', (conn) => {
+//     connections.push(conn)
+//     conn.on('data', async () => {})
+
+//     conn.on('close', () => {
+//       connections = connections.filter((c) => c.readyState !== 3)
+//     })
+//   })
+//   echo.installHandlers(app, { prefix: '/ws' })
+// }
+
 // eslint-disable-next-line
 console.log(`Serving at http://localhost:${port}`)
