@@ -10,9 +10,9 @@ const Startup = (props) => {
 
   useEffect(() => {
     if (token) {
+      dispatch(tryGetUserInfo())
       dispatch(trySignIn())
     }
-    dispatch(tryGetUserInfo())
   }, [])
 
   return props.children

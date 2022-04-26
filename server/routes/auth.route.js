@@ -8,6 +8,7 @@ import express from 'express'
 import jwt from 'jsonwebtoken'
 
 import config from '../config'
+import auth from '../middleware/auth'
 import User from '../model/User.model'
 
 const router = express.Router()
@@ -25,16 +26,22 @@ const router = express.Router()
 //   next()
 // })
 
-router.get('/', async (req, res) => {
+router.get('/', auth([]), async (req, res) => {
   try {
     //  jwt занимается конкретно проверкой токена "на подлинность" получается
-    const jwtUser = jwt.verify(req.cookies.token, config.secret)
-    const user = await User.findById(jwtUser.uid)
-    const payload = { uid: user.id }
-    user.password = undefined
+    // const jwtUser = jwt.verify(req.cookies.token, config.secret)
+    // const user = await User.findById(jwtUser.uid)
+    // const payload = { uid: user.id }
+    // user.password = undefined
+    // res.json({ status: 'ok', token, user })
+
+    // то же самое, что вышЕ только через auth - парсинг токена и поиск юзера по полученому айди
+    // произойдет с помощью passport-jwt, а не jwt.
+    const payload = { uid: req.user.id }
+    req.user.password = undefined
     const token = jwt.sign(payload, config.secret, { expiresIn: '48h' })
     res.cookie('token', token, { maxAge: 1000 * 60 * 60 * 48 })
-    res.json({ status: 'ok', token, user })
+    res.json({ status: 'ok', token, user: req.user })
   } catch (err) {
     res.json({ status: 'error', err })
   }
@@ -54,6 +61,24 @@ router.post('/', async (req, res) => {
   } catch (err) {
     res.json({ status: 'error', err })
   }
+})
+
+router.post('/register', async (req, res) => {
+  // try {
+  const user = await User.findOne({ email: req.body.email })
+  if (user) {
+    res.status(401).json({ status: 'error', err: 'Email already taken' })
+  }
+
+  const userObj = new User({
+    email: req.body.email,
+    password: req.body.password
+  })
+  userObj.save()
+  res.json({ status: 'ok' })
+  // } catch (err) {
+  //   res.json({ status: 'error', err })
+  // }
 })
 
 export default router

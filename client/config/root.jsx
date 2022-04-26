@@ -9,6 +9,7 @@ import Home from '../components/home'
 import LoginForm from '../components/login'
 import NotFound from '../components/404'
 import Admin from '../components/admin'
+import RegistrationForm from '../components/registration'
 
 import Startup from './startup'
 
@@ -24,9 +25,14 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
   const auth = useSelector((s) => s.auth)
 
   const func = (props) => {
+    if (!!auth.user && !!auth.token && auth.user.role?.includes('admin')) {
+      return <Component {...props} />
+    }
+
     if (!!auth.user && !!auth.token) {
       return <Component {...props} />
     }
+
     return (
       <Redirect
         to={{
@@ -35,24 +41,7 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
       />
     )
   }
-  return <Route {...rest} render={func} />
-}
 
-const PrivateRouteAdmin = ({ component: Component, ...rest }) => {
-  const auth = useSelector((s) => s.auth)
-
-  const func = (props) => {
-    if (!!auth.user && !!auth.token && auth.user?.role?.includes('admin')) {
-      return <Component {...props} />
-    }
-    return (
-      <Redirect
-        to={{
-          pathname: '/chat'
-        }}
-      />
-    )
-  }
   return <Route {...rest} render={func} />
 }
 
@@ -65,9 +54,10 @@ const RootComponent = (props) => {
       <RouterSelector history={history} location={props.location} context={props.context}>
         <Startup>
           <Switch>
-            <PrivateRouteAdmin exact path="/admin" component={Admin} />
             <PrivateRoute exact path="/chat" component={Home} />
+            <PrivateRoute exact path="/admin" component={Admin} />
             <OnlyAnonymousRoute exact path="/login" component={LoginForm} />
+            <Route exact path="/registration" component={RegistrationForm} />
             <Route exact path="/" component={LoginForm} />
             <Route component={NotFound} />
           </Switch>

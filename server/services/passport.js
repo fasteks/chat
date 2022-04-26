@@ -15,6 +15,8 @@ const cookieExtractor = (req) => {
   return req && req.cookies && req.cookies.token
 }
 
+// options is an object literal containing options to control
+// how the token is extracted from the request or verified.
 // содержит параметры для управления тем, как токен извлекается из запроса или ?проверяется?.
 const jwtOptions = {
   secretOrKey: config.secret,

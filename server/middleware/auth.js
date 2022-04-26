@@ -31,6 +31,8 @@ const auth =
   (req, res, next) => {
     return passport.authenticate(
       'jwt',
+      // (passport.authenticate() middleware invokes req.login() automatically.)
+      // if jwt strategy succeed automaticaly establishing session even if leha sets it too
       // session: false = не сохраняет никакие данные о текущем логине в сессии
       {
         session: true

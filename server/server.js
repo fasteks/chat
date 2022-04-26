@@ -45,6 +45,7 @@ const middleware = [
   cors(),
   // Passport is an authentication middleware for Node that authenticates requests.
   // So basically passport.initialize() initialises the authentication module.
+  // To use Passport in an Express - configure it with the required middleware
   passport.initialize(),
   express.static(path.resolve(__dirname, '../dist/assets')),
   express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }),
@@ -72,8 +73,8 @@ passport.use('jwt', passportJWT.jwt)
 // а вот обработать его содержимое под наши нужды (разрешить/запретить переход по пути)
 // уже делает auth middleware
 // passportJWT ищет user по token, auth обрабатывает содержимое user
-server.get('/api/v1/user-info', auth([]), (req, res) => {
-  res.json('777')
+server.get('/api/v1/user-info', auth(['admin']), (req, res) => {
+  res.json({ status: 'ok' })
 })
 
 // Данное приложение теперь может обрабатывать запросы, адресованные на api/v1/auth

@@ -9,12 +9,12 @@ import classnames from 'classnames'
 import './sidebar.scss'
 
 import { addChannel, channelLogin, channelLogout, switchChannel } from '../redux/reducers/channels'
-import { history } from '../redux'
+// import { tryGetUserInfo } from '../redux/reducers/auth'
 
 const Sidebar = () => {
   const dispatch = useDispatch()
   const { channels } = useSelector((s) => s.channels)
-  const { id, name, isOnline } = useSelector((s) => s.auth.user)
+  const { id, email, isOnline } = useSelector((s) => s.auth.user)
   const [active, setActive] = useState(null)
   const [bell, setBell] = useState(true)
   const [channelsClicked, setchannelsClicked] = useState(false)
@@ -31,7 +31,7 @@ const Sidebar = () => {
       </h2>
       <h3 className="sidebar__user">
         <i className={classnames('status', { 'status--online': isOnline })} />
-        {name}
+        {email}
       </h3>
       <h3
         className="sidebar__channels channels"
@@ -122,16 +122,15 @@ const Sidebar = () => {
         <p>Olivia</p>
       </div>
       <h3 className="sidebar__applications">Applications</h3>
-      <button
+      {/* <button
         type="button"
         className="mt-auto text-sm text-blue-800"
         onClick={() => {
-          fetch('/api/v1/user-info')
-          history.push('/admin')
+          dispatch(tryGetUserInfo())
         }}
       >
         admin
-      </button>
+      </button> */}
     </div>
   )
 }
