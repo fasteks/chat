@@ -93,10 +93,10 @@ const Sidebar = () => {
           </button>
         )}
       </h3>
-      {Object.keys(channels).map((el, index) => {
+      {channels.map((el) => {
         return (
           <button
-            key={el + index}
+            key={el._id}
             type="button"
             className={classnames('sidebar__channel', {
               active: active === el
@@ -112,7 +112,7 @@ const Sidebar = () => {
               }
             }}
           >
-            {el}
+            {el.title}
           </button>
         )
       }) || <span className="hidden">&nbsp;</span>}

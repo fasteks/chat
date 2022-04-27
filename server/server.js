@@ -14,13 +14,13 @@ import config from './config'
 import mongooseService from './services/mongoose'
 import passportJWT from './services/passport'
 // import User from './model/User.model'
+import Channel from './model/Channel.model'
 import auth from './middleware/auth'
-// import Kitten from './model/Kitten.model'
 import authRoute from './routes/auth.route'
 
 import Html from '../client/html'
 
-const { readFile, writeFile } = require('fs').promises
+const { writeFile } = require('fs').promises
 
 require('colors')
 
@@ -37,6 +37,8 @@ try {
 
 const port = process.env.PORT || 8090
 const app = express()
+
+let connections = []
 
 const middleware = [
   cors(),
@@ -110,27 +112,48 @@ app.use('/api/v1/auth', authRoute)
 // })
 
 const getChannels = () => {
-  return readFile(`${__dirname}/data/channels.json`, 'utf-8')
-    .then((string) => {
-      return JSON.parse(string)
-    })
-    .catch(async () => {
-      await writeFile(`${__dirname}/data/channels.json`, JSON.stringify({}), 'utf-8')
-      return {}
-    })
+  return Channel.find({})
+    .then((it) => it)
+    .catch((err) => err)
 }
+
+// отправлять инфу другим - можно и через connection.emit внутри тела обработчика любого api выше
+// listOfNeededIds - массив определенных нами id из db
+// connections.filter(({ id }) => listOfNeededIds.includes(id))
+// выбор нужных наших id (среди списка всех активных сокетов) для выполнения на них eventa
+// .forEach((conn) => conn.emit('chatMessage', JSON.stringify({ type: UPDATE_MEESSAGES, messageList: message })))
+// отправка каждому выбранного сокету экшена для исполнения в редакс.
+// общение всегда через строку, {UPDATE_MEESSAGES, messageList - ключи в сторе редакса, message - новый payload
 
 app.get('/api/v1/channels', async (req, res) => {
   const channels = await getChannels()
+  // console.log('channels', channels)
   res.json(channels)
+  // const action = { type: GET_CHANNELS, channelsObj: channels }
+  // connections.forEach((conn) => {
+  //   conn.emmit('getChannels', JSON.stringify(action))
+  // })
 })
 
 app.post('/api/v1/channels', async (req, res) => {
-  const { title } = req.body
+  // const { title } = req.body
+  // const channels = await getChannels()
+  // const updatedChannels = { ...channels, [title]: { usersId: [], messages: [] } }
+  // await writeFile(`${__dirname}/data/channels.json`, JSON.stringify(updatedChannels), 'utf-8')
+  // res.json(updatedChannels)
+  const { channelTitle } = req.body
   const channels = await getChannels()
-  const updatedChannels = { ...channels, [title]: { usersId: [], messages: [] } }
-  await writeFile(`${__dirname}/data/channels.json`, JSON.stringify(updatedChannels), 'utf-8')
-  res.json(updatedChannels)
+  const isUniqueChannel = !channels.includes(channelTitle)
+  const newChannel = new Channel({ title: channelTitle })
+  await newChannel.save()
+  const updatedChannels = await getChannels()
+  if (isUniqueChannel) {
+    return connections.forEach((conn) => {
+      conn.emit('updateChannels', JSON.stringify(updatedChannels))
+    })
+  }
+  console.log('cannot add new channel')
+  return res.json('something wrong')
 })
 
 app.post('/api/v1/channel', async (req, res) => {
@@ -212,18 +235,31 @@ const { Server } = require('socket.io')
 
 const io = new Server(server)
 
-let connections = []
-
+// а получение инфы извне должно описываться здесь, ниже - псевдокод
+// connection.on('event.name', eventHanlderFunc(event.payload) { })
+// eventHandlerFunc может лежать в отдельном специально выделенном файле
 io.on('connection', (connection) => {
-  const user = jwt.verify(connection.handshake.auth.token, config.secret)
-  // eslint-disable-next-line
-  connection.userId = user.uid
-  connections.push(connection)
-  connection.emit('chatMessage', JSON.stringify({ message: 'hello world' }))
+  try {
+    if (connection.handshake.auth.token) {
+      const user = jwt.verify(connection.handshake.auth.token, config.secret)
+      // eslint-disable-next-line
+      connection.userId = user.uid
+      connections.push(connection)
+    }
 
-  connection.on('disconnect', () => {
-    connections = connections.filter((it) => it.id !== connection.id)
-  })
+    // connection.emit('chatMessage', JSON.stringify({ message: 'hello world from api' }))
+  } catch (err) {
+    console.log('error:', err)
+  } finally {
+    connection.on('disconnect', () => {
+      connections = connections.filter((it) => it.id !== connection.id)
+    })
+    // console.log('current connections:', connections)
+    console.log(
+      'current connections:',
+      connections.map((it) => it.userId)
+    )
+  }
 })
 
 server.listen(port)

@@ -8,6 +8,8 @@ import Cookies from 'universal-cookie'
 import rootReducer from './reducers'
 import createHistory from './history'
 
+import { ADD_CHANNEL } from './reducers/channels'
+
 export const history = createHistory()
 
 const initialState = {}
@@ -32,8 +34,14 @@ const socket = io('/', {
 //   console.log('successful connection')
 // })
 
-socket.on('chatMessage', (message) => {
-  console.log(message)
+socket.on('updateChannels', (payload) => {
+  // почему-то не хочет строку парсить целиком
+  return store.dispatch({ type: ADD_CHANNEL, channelsList: JSON.parse(payload) })
+
+  // примерный вид action = { type: UPDATE_MESSAGES, channelsList: payload }
+  // store.dispatch(JSON.parse(message))
+  // то есть, с сервера отправлять команды/экшены напрямую в редакс
+  // без редакса, описание сокетов внутрь юзэффекта и на уровне рутов сделать
 })
 
 // import socketActions from './sockets'

@@ -1,14 +1,14 @@
 import axios from 'axios'
 
 const GET_CHANNELS = '@chat/channels/GET_CHANNELS'
-const ADD_CHANNEL = '@chat/channels/ADD_CHANNEL'
+export const ADD_CHANNEL = '@chat/channels/ADD_CHANNEL'
 const SWITCH_CHANNEL = '@chat/channels/SWITCH_CHANNEL'
 const SEND_MESSAGE = '@chat/channels/SEND_MESSAGE'
 export const channelLogin = 'login'
 export const channelLogout = 'logout'
 
 const initialState = {
-  channels: {},
+  channels: [],
   currentChannel: ''
 }
 
@@ -40,7 +40,7 @@ export default (state = initialState, action = {}) => {
     case ADD_CHANNEL: {
       return {
         ...state,
-        channels: action.channelsObj
+        channels: action.channelsList
       }
     }
     case SWITCH_CHANNEL: {
@@ -75,18 +75,19 @@ export function getChannels() {
 }
 
 export function addChannel(title) {
-  return async (dispatch) => {
+  // return async (dispatch) => {
+  return async () => {
     await axios({
       method: 'post',
       url: '/api/v1/channels',
       data: {
-        title
+        channelTitle: title
       }
     })
-      .then(({ data }) => {
-        dispatch({ type: ADD_CHANNEL, channelsObj: data })
-      })
-      .catch((err) => err)
+    // .then(({ data }) => {
+    //   dispatch({ type: ADD_CHANNEL, channelsObj: data })
+    // })
+    // .catch((err) => err)
   }
 }
 
