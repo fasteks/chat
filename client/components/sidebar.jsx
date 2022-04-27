@@ -8,13 +8,12 @@ import { faCheck } from '@fortawesome/free-solid-svg-icons'
 import classnames from 'classnames'
 import './sidebar.scss'
 
-import { addChannel, channelLogin, channelLogout, switchChannel } from '../redux/reducers/channels'
-// import { tryGetUserInfo } from '../redux/reducers/auth'
+import { addChannel, switchChannel } from '../redux/reducers/channels'
 
 const Sidebar = () => {
   const dispatch = useDispatch()
   const { channels } = useSelector((s) => s.channels)
-  const { id, email, isOnline } = useSelector((s) => s.auth.user)
+  const { user } = useSelector((s) => s.auth)
   const [active, setActive] = useState(null)
   const [bell, setBell] = useState(true)
   const [channelsClicked, setchannelsClicked] = useState(false)
@@ -30,8 +29,8 @@ const Sidebar = () => {
         </button>
       </h2>
       <h3 className="sidebar__user">
-        <i className={classnames('status', { 'status--online': isOnline })} />
-        {email}
+        <i className={classnames('status', { 'status--online': 1 })} />
+        {user.email}
       </h3>
       <h3
         className="sidebar__channels channels"
@@ -93,26 +92,26 @@ const Sidebar = () => {
           </button>
         )}
       </h3>
-      {channels.map((el) => {
+      {channels.map((channel) => {
         return (
           <button
-            key={el._id}
+            key={channel._id}
             type="button"
             className={classnames('sidebar__channel', {
-              active: active === el
+              active: active === channel._id
             })}
             onClick={() => {
-              if (active === el) {
-                dispatch(switchChannel(el, id, channelLogout))
+              if (active === channel._id) {
+                dispatch(switchChannel(channel._id, user._id))
                 setActive(null)
               }
-              if (active !== el) {
-                dispatch(switchChannel(el, id, channelLogin))
-                setActive(el)
+              if (active !== channel._id) {
+                dispatch(switchChannel(channel._id, user._id))
+                setActive(channel._id)
               }
             }}
           >
-            {el.title}
+            {channel.title}
           </button>
         )
       }) || <span className="hidden">&nbsp;</span>}
@@ -122,15 +121,6 @@ const Sidebar = () => {
         <p>Olivia</p>
       </div>
       <h3 className="sidebar__applications">Applications</h3>
-      {/* <button
-        type="button"
-        className="mt-auto text-sm text-blue-800"
-        onClick={() => {
-          dispatch(tryGetUserInfo())
-        }}
-      >
-        admin
-      </button> */}
     </div>
   )
 }

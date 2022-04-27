@@ -156,21 +156,30 @@ app.post('/api/v1/channels', async (req, res) => {
   return res.json('something wrong')
 })
 
-app.post('/api/v1/channel', async (req, res) => {
-  const { id, channel, action } = req.body
-  const channels = await getChannels()
-  const updatedChannels = {
-    ...channels,
-    [channel]: {
-      ...channels[channel],
-      usersId:
-        action === 'login'
-          ? [...channels[channel].usersId, id]
-          : channels[channel].usersId.filter((el) => el !== id)
-    }
-  }
-  await writeFile(`${__dirname}/data/channels.json`, JSON.stringify(updatedChannels), 'utf-8')
-  res.json(updatedChannels)
+app.post('/api/v1/channel', async (req) => {
+  const { channelId, userId } = req.body
+  // console.log('channelId', channelId)
+  // console.log('userId', userId)
+
+  const channel = await Channel.findOne({ _id: channelId })
+  // console.log('channel', channel)
+
+  const updatedUsersOnChannel = channel.usersOnChannel.includes(userId)
+    ? channel.usersOnChannel.filter((id) => id !== userId)
+    : [...channel.usersOnChannel, userId]
+  // console.log('updatedUsersOnChannel', updatedUsersOnChannel)
+
+  // const updatedChannel = { ...channel._doc, usersOnChannel: updatedUsersOnChannel }
+  // console.log('updatedChannel', updatedChannel)
+
+  await Channel.updateOne({ _id: channelId }, { usersOnChannel: updatedUsersOnChannel })
+
+  const updatedChannels = await Channel.find({})
+  // console.log('updatedChannels', updatedChannels)
+
+  return connections.forEach((conn) => {
+    conn.emit('updateChannel', JSON.stringify(updatedChannels))
+  })
 })
 
 const setMessage = (id, messageText) => {

@@ -6,6 +6,16 @@ const channelSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true
+    },
+    usersOnChannel: {
+      type: Array,
+      required: true,
+      default: []
+    },
+    messagesList: {
+      type: Array,
+      required: true,
+      default: []
     }
   },
   {

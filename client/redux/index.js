@@ -8,7 +8,7 @@ import Cookies from 'universal-cookie'
 import rootReducer from './reducers'
 import createHistory from './history'
 
-import { ADD_CHANNEL } from './reducers/channels'
+import { ADD_CHANNEL, SWITCH_CHANNEL } from './reducers/channels'
 
 export const history = createHistory()
 
@@ -30,13 +30,9 @@ const socket = io('/', {
   }
 })
 
-// socket.on('connect', () => {
-//   console.log('successful connection')
-// })
-
 socket.on('updateChannels', (payload) => {
   // почему-то не хочет строку парсить целиком
-  return store.dispatch({ type: ADD_CHANNEL, channelsList: JSON.parse(payload) })
+  return store.dispatch({ type: ADD_CHANNEL, channelsArray: JSON.parse(payload) })
 
   // примерный вид action = { type: UPDATE_MESSAGES, channelsList: payload }
   // store.dispatch(JSON.parse(message))
@@ -44,36 +40,8 @@ socket.on('updateChannels', (payload) => {
   // без редакса, описание сокетов внутрь юзэффекта и на уровне рутов сделать
 })
 
-// import socketActions from './sockets'
-// const isBrowser = typeof window !== 'undefined'
-// let socket
-// if (typeof ENABLE_SOCKETS !== 'undefined' && ENABLE_SOCKETS === 'true') {
-//   const initSocket = () => {
-//     socket = new SockJS(`${isBrowser ? window.location.origin : 'http://localhost'}/ws`)
-
-//     socket.onopen = () => {
-//       store.dispatch(socketActions.connected)
-//     }
-
-//     socket.onmessage = (message) => {
-//       // eslint-disable-next-line no-console
-//       console.log(message)
-
-//       // socket.close();
-//     }
-
-//     socket.onclose = () => {
-//       store.dispatch(socketActions.disconnected)
-//       setTimeout(() => {
-//         initSocket()
-//       }, 2000)
-//     }
-//   }
-
-//   initSocket()
-// }
-// export function getSocket() {
-//   return socket
-// }
+socket.on('updateChannel', (payload) => {
+  return store.dispatch({ type: SWITCH_CHANNEL, channelsArray: JSON.parse(payload) })
+})
 
 export default store
