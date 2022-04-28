@@ -5,7 +5,7 @@ import { renderToStaticNodeStream } from 'react-dom/server'
 import React from 'react'
 
 import cookieParser from 'cookie-parser'
-import shortid from 'shortid'
+// import shortid from 'shortid'
 
 import passport from 'passport'
 import jwt from 'jsonwebtoken'
@@ -14,13 +14,12 @@ import config from './config'
 import mongooseService from './services/mongoose'
 import passportJWT from './services/passport'
 // import User from './model/User.model'
-import Channel from './model/Channel.model'
 import auth from './middleware/auth'
 import authRoute from './routes/auth.route'
+import Channel from './model/Channel.model'
+import Message from './model/Message.model'
 
 import Html from '../client/html'
-
-const { writeFile } = require('fs').promises
 
 require('colors')
 
@@ -111,11 +110,11 @@ app.use('/api/v1/auth', authRoute)
 //   }
 // })
 
-const getChannels = () => {
-  return Channel.find({})
-    .then((it) => it)
-    .catch((err) => err)
-}
+// const getChannels = () => {
+//   return Channel.find({})
+//     .then((it) => it)
+//     .catch((err) => err)
+// }
 
 // отправлять инфу другим - можно и через connection.emit внутри тела обработчика любого api выше
 // listOfNeededIds - массив определенных нами id из db
@@ -126,7 +125,7 @@ const getChannels = () => {
 // общение всегда через строку, {UPDATE_MEESSAGES, messageList - ключи в сторе редакса, message - новый payload
 
 app.get('/api/v1/channels', async (req, res) => {
-  const channels = await getChannels()
+  const channels = await Channel.find({})
   // console.log('channels', channels)
   res.json(channels)
   // const action = { type: GET_CHANNELS, channelsObj: channels }
@@ -142,22 +141,63 @@ app.post('/api/v1/channels', async (req, res) => {
   // await writeFile(`${__dirname}/data/channels.json`, JSON.stringify(updatedChannels), 'utf-8')
   // res.json(updatedChannels)
   const { channelTitle } = req.body
-  const channels = await getChannels()
-  const isUniqueChannel = !channels.includes(channelTitle)
-  const newChannel = new Channel({ title: channelTitle })
-  await newChannel.save()
-  const updatedChannels = await getChannels()
-  if (isUniqueChannel) {
-    return connections.forEach((conn) => {
+  const channels = await Channel.find({})
+  const isUniqueChannel = channels.find((it) => it.title === channelTitle)
+  if (!isUniqueChannel) {
+    const newChannel = new Channel({ title: channelTitle })
+    await newChannel.save()
+    const updatedChannels = await Channel.find({})
+    connections.forEach((conn) => {
       conn.emit('updateChannels', JSON.stringify(updatedChannels))
     })
+    return res.json({ status: 'ok' })
   }
-  console.log('cannot add new channel')
-  return res.json('something wrong')
+  return res.status(418).json({ status: 418, message: 'Channel name already taken!' })
 })
 
+// app.post('/api/v1/channel', auth([]), async (req, res) => {
+//   const { channelId, channelTitle } = req.body
+
+//   const channelOld = Channel.findOne({ usersOnChannel: { $in: req.user.id } }).exec().then((channel) => {
+
+//   })
+
+//   if (channelOld) {
+//     const usersOnline = channelOld.usersOnChannel.filter((id) => id !== req.user.id)
+//     await Channel.updateOne(
+//       { usersOnChannel: { $in: req.user.id } },
+//       {
+//         $set: {
+//           usersOnChannel: usersOnline
+//         }
+//       }
+//     )
+//   }
+
+//   if (channelId !== channelOld?.id) {
+//     const channelNew = await Channel.findOne({ _id: channelId })
+//     await Channel.updateOne(
+//       {
+//         _id: channelId
+//       },
+//       {
+//         $set: {
+//           usersOnChannel: [...channelNew.usersOnChannel, req.user.id]
+//         }
+//       }
+//     )
+//   }
+
+//   const updatedChannels = await Channel.find({})
+
+//   res.json({ updatedChannels, channelTitle })
+//   // return connections.forEach((conn) => {
+//   //   conn.emit('updateChannel', JSON.stringify(updatedChannels))
+//   // })
+// })
+
 app.post('/api/v1/channel', auth([]), async (req, res) => {
-  const { channelId } = req.body
+  const { channelId, channelTitle } = req.body
 
   const channelOld = await Channel.findOne({ usersOnChannel: { $in: req.user.id } })
 
@@ -173,9 +213,8 @@ app.post('/api/v1/channel', auth([]), async (req, res) => {
     )
   }
 
-  const channelNew = await Channel.findOne({ _id: channelId })
-
   if (channelId !== channelOld?.id) {
+    const channelNew = await Channel.findOne({ _id: channelId })
     await Channel.updateOne(
       {
         _id: channelId
@@ -190,7 +229,7 @@ app.post('/api/v1/channel', auth([]), async (req, res) => {
 
   const updatedChannels = await Channel.find({})
 
-  res.json(updatedChannels)
+  res.json({ updatedChannels, channelTitle })
   // return connections.forEach((conn) => {
   //   conn.emit('updateChannel', JSON.stringify(updatedChannels))
   // })
@@ -223,28 +262,77 @@ app.post('/api/v1/channel', auth([]), async (req, res) => {
 //   })
 // })
 
-const setMessage = (id, messageText) => {
-  return {
-    userId: id,
-    messageId: shortid.generate(),
-    messageStr: messageText,
-    messageDate: new Date(),
-    meta: {}
-  }
-}
+app.post('/api/v1/channel/message', auth([]), async (req, res) => {
+  // законмментрированно сохранение сообщений в бд
+  try {
+    const { currentChannel, message } = req.body
+    const newMessage = new Message({
+      userId: req.user.id,
+      userName: req.user.email,
+      messageText: message
+    })
+    await newMessage.save()
 
-app.post('/api/v1/channel/message', async (req, res) => {
-  const { currentChannel, id, message } = req.body
-  const channels = await getChannels()
-  const updatedChannels = {
-    ...channels,
-    [currentChannel]: {
-      ...channels[currentChannel],
-      messages: [...channels[currentChannel].messages, setMessage(id, message)]
-    }
+    const channelOld = await Channel.findOne({ usersOnChannel: { $in: req.user.id } })
+
+    await Channel.updateOne(
+      {
+        title: currentChannel
+      },
+      {
+        $set: {
+          messagesList: [...channelOld.messagesList, newMessage]
+        }
+      }
+    )
+    const updatedChannels = await Channel.find({})
+
+    connections.forEach(async (conn) => {
+      await conn.emit('updateMessages', JSON.stringify(updatedChannels))
+    })
+    res.json({ status: 'ok' })
+  } catch (err) {
+    res.json({ ...err })
   }
-  await writeFile(`${__dirname}/data/channels.json`, JSON.stringify(updatedChannels), 'utf-8')
-  res.json(updatedChannels)
+
+  // без сохранения в бд
+  // try {
+  //   const { currentChannel, message } = req.body
+  //   const newMessage = new Message({
+  //     userId: req.user.id,
+  //     userName: req.user.email,
+  //     messageText: message
+  //   })
+
+  //   connections.forEach(async (conn) => {
+  //     await conn.emit('updateMessages', JSON.stringify({ currentChannel, newMessage }))
+  //   })
+  //   res.json({ status: 'ok' })
+  // } catch (err) {
+  //   res.json({ ...err })
+  // }
+
+  // старый код с чтением и записью в файл
+  // const channelOld = await Channel.findOne({ usersOnChannel: { $in: req.user.id } })
+  // const channels = await getChannels()
+  // const updatedChannels = {
+  //   ...channels,
+  //   [currentChannel]: {
+  //     ...channels[currentChannel],
+  //     messages: [...channels[currentChannel].messages, setMessage(id, message)]
+  //   }
+  // }
+  // await writeFile(`${__dirname}/data/channels.json`, JSON.stringify(updatedChannels), 'utf-8')
+
+  // const updatedChannels = await Channel.find({})
+  // res.json(updatedChannels)
+
+  // тупо рассылка строки
+  // const { currentChannel, message } = req.body
+
+  // return connections.forEach(async (conn) => {
+  //   await conn.emit('updateMessages', JSON.stringify({ currentChannel, message }))
+  // })
 })
 
 app.use('/api/', (req, res) => {

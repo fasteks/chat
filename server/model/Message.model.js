@@ -4,8 +4,13 @@ const messageSchema = new mongoose.Schema(
   {
     userId: {
       type: String,
-      required: true,
-      default: this.req.user._id
+      required: true
+      // default: this.req.user._id
+    },
+    userName: {
+      type: String,
+      required: true
+      // default: this.req.user.email
     },
     messageText: {
       type: String,
@@ -14,11 +19,9 @@ const messageSchema = new mongoose.Schema(
     },
     messageDate: {
       type: String,
-      required: true,
-      default: JSON.stringify(new Date())
+      default: () => new Date()
     },
     meta: {
-      required: true,
       default: {}
     }
   },

@@ -123,7 +123,7 @@ export function tryGetUserInfo() {
 }
 
 export function signUp(email, password, confirmPassword) {
-  return async (dispatch) => {
+  return (dispatch) => {
     if (password !== confirmPassword) {
       return {
         type: REGISTER,

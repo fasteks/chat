@@ -12,14 +12,14 @@ const Main = () => {
   const [message, setMessage] = useState('')
   const [search, setSearch] = useState('')
   const { channels, currentChannel } = useSelector((s) => s.channels)
-  const { id } = useSelector((s) => s.auth.user)
-  const isChannel = currentChannel.length === 0
+  // const isChannel = currentChannel?.length === 0
+  const isChannel = !currentChannel
   const areChannels = channels?.length !== 0
   const messagesLength = channels.find((it) => it.title === currentChannel)?.messagesList.length
   const areMessages = messagesLength !== 0
 
   useEffect(() => {
-    document.querySelector('.main__messages').lastChild?.scrollIntoView()
+    document.querySelector('.main__messages')?.lastChild?.scrollIntoView()
   }, [messagesLength])
 
   return (
@@ -48,14 +48,15 @@ const Main = () => {
         {isChannel && !areChannels && <p className="messages__alert">Make a channel!</p>}
         {!isChannel &&
           areMessages &&
-          channels[currentChannel]?.messages
-            .map((it) => {
-              return <Message key={it.messageId} message={it} />
+          channels
+            ?.find((it) => it.title === currentChannel)
+            ?.messagesList.map((it) => {
+              return <Message key={it._id} message={it} />
             })
             .filter((it) =>
               search.length !== 0
-                ? it.props.message.messageStr.toLowerCase().includes(search.toLowerCase()) ||
-                  it.props.message.userId.toLowerCase().includes(search.toLowerCase())
+                ? it.props.message.messageText.toLowerCase().includes(search.toLowerCase()) ||
+                  it.props.message.userName.toLowerCase().includes(search.toLowerCase())
                 : it
             )}
         {!isChannel && !areMessages && (
@@ -68,8 +69,8 @@ const Main = () => {
             type="button"
             className="message__button bg-white"
             onClick={() => {
-              if (message.length > 1 && message.trim() !== '') {
-                dispatch(sendMessage(currentChannel, id, message))
+              if (message.length >= 1 && message.trim() !== '') {
+                dispatch(sendMessage(currentChannel, message))
                 setMessage('')
               }
             }}
@@ -88,9 +89,14 @@ const Main = () => {
               setMessage(e.target.value)
             }}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey && message.length > 1 && message.trim() !== '') {
+              if (
+                e.key === 'Enter' &&
+                !e.shiftKey &&
+                message.length >= 1 &&
+                message.trim() !== ''
+              ) {
                 e.preventDefault()
-                dispatch(sendMessage(currentChannel, id, message))
+                dispatch(sendMessage(currentChannel, message))
                 setMessage('')
               }
             }}

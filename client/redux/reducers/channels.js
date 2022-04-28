@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const GET_CHANNELS = '@chat/channels/GET_CHANNELS'
+export const GET_CHANNELS = '@chat/channels/GET_CHANNELS'
 export const ADD_CHANNEL = '@chat/channels/ADD_CHANNEL'
 export const SWITCH_CHANNEL = '@chat/channels/SWITCH_CHANNEL'
 export const SET_CHANNEL = '@chat/channels/SET_CHANNEL'
@@ -30,7 +30,8 @@ export default (state = initialState, action = {}) => {
     case SWITCH_CHANNEL: {
       return {
         ...state,
-        channels: action.channelsArray
+        channels: action.channelsArray,
+        currentChannel: action.destinationChannel
       }
     }
     case SET_CHANNEL: {
@@ -51,8 +52,8 @@ export default (state = initialState, action = {}) => {
 }
 
 export function getChannels() {
-  return async (dispatch) => {
-    await axios({
+  return (dispatch) => {
+    axios({
       method: 'get',
       url: '/api/v1/channels'
     })
@@ -64,53 +65,47 @@ export function getChannels() {
 }
 
 export function addChannel(title) {
-  return async () => {
-    await axios({
+  return () => {
+    axios({
       method: 'post',
       url: '/api/v1/channels',
       data: {
         channelTitle: title
       }
-    })
+    }).catch((err) => err)
   }
 }
 
-export function switchChannel(channelId) {
-  return async (dispatch) => {
-    await axios({
+export function switchChannel(channelId, channelTitle) {
+  return (dispatch) => {
+    axios({
       method: 'post',
       url: '/api/v1/channel',
       data: {
-        channelId
+        channelId,
+        channelTitle
       }
     })
       .then(({ data }) => {
         return dispatch({
           type: SWITCH_CHANNEL,
-          channelsArray: data
+          channelsArray: data.updatedChannels,
+          destinationChannel: data.channelTitle
         })
       })
       .catch((err) => err)
   }
 }
 
-export function sendMessage(currentChannel, id, message) {
-  return async (dispatch) => {
-    await axios({
+export function sendMessage(currentChannel, message) {
+  return () => {
+    axios({
       method: 'post',
       url: '/api/v1/channel/message',
       data: {
         currentChannel,
-        id,
         message
       }
-    })
-      .then(({ data }) => {
-        return dispatch({
-          type: SEND_MESSAGE,
-          channelsObj: data
-        })
-      })
-      .catch((err) => err)
+    }).catch((err) => err)
   }
 }

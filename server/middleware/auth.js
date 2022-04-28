@@ -12,7 +12,16 @@ const handleJWT = (req, res, next, roles) => {
 
     if (error || !user) return res.status(401).json({ status: 401, ...error })
 
+    // Note: passport.authenticate() middleware invokes req.login() automatically.
+    // This function is primarily used when users sign up,
+    // during which req.login() can be invoked to automatically log in the newly registered user.
+    // то есть, вход в профиль после успешной регистрации
+
+    // When the login operation completes, user will be assigned to req.user.
+    // вероятно, функция неявно присваивает req.user = user
+    // хотя Леха и повторяет этот же код на 26 строке?
     await req.logIn(user, { session: false })
+    // session: false = не сохраняет никакие данные о текущем логине в сессии
 
     // see if user is authorized to do the action
     if (!roles.reduce((acc, rec) => acc && user.role.some((t) => t === rec), true)) {
@@ -20,7 +29,7 @@ const handleJWT = (req, res, next, roles) => {
     }
 
     // если роут не анонимный, то миддлвэр заполняет запрос пользователем
-    req.user = user
+    // req.user = user
     return next()
   }
 }
@@ -33,7 +42,6 @@ const auth =
       'jwt',
       // (passport.authenticate() middleware invokes req.login() automatically.)
       // if jwt strategy succeed automaticaly establishing session even if leha sets it too
-      // session: false = не сохраняет никакие данные о текущем логине в сессии
       {
         session: true
       },

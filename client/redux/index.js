@@ -8,7 +8,7 @@ import Cookies from 'universal-cookie'
 import rootReducer from './reducers'
 import createHistory from './history'
 
-import { ADD_CHANNEL } from './reducers/channels'
+import { ADD_CHANNEL, GET_CHANNELS } from './reducers/channels'
 
 export const history = createHistory()
 
@@ -43,5 +43,28 @@ socket.on('updateChannels', (payload) => {
   // то есть, с сервера отправлять команды/экшены напрямую в редакс
   // без редакса, описание сокетов внутрь юзэффекта и на уровне рутов сделать
 })
+
+// запись строки в редакс из предварительно сохраненной записи в дб
+socket.on('updateMessages', (payload) => {
+  return store.dispatch({ type: GET_CHANNELS, channelsArray: JSON.parse(payload) })
+})
+
+// // запись строки только в редакс без записи в дб
+// socket.on('updateMessages', (payload) => {
+//   const data = JSON.parse(payload)
+//   const { channels } = store.getState().channels
+
+//   const updatedChannels = channels.map((it) => {
+//     if (it.title === data.currentChannel) {
+//       return {
+//         ...it,
+//         messagesList: [...it.messagesList, data.newMessage]
+//       }
+//     }
+//     return it
+//   })
+
+//   return store.dispatch({ type: GET_CHANNELS, channelsArray: updatedChannels })
+// })
 
 export default store
