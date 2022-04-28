@@ -126,7 +126,6 @@ app.use('/api/v1/auth', authRoute)
 
 app.get('/api/v1/channels', async (req, res) => {
   const channels = await Channel.find({})
-  // console.log('channels', channels)
   res.json(channels)
   // const action = { type: GET_CHANNELS, channelsObj: channels }
   // connections.forEach((conn) => {
@@ -155,12 +154,46 @@ app.post('/api/v1/channels', async (req, res) => {
   return res.status(418).json({ status: 418, message: 'Channel name already taken!' })
 })
 
+// лехин способ из лекции по монгусу - линт ругается
+app.post('/api/v1/channel', auth([]), async (req, res) => {
+  const { channelId } = req.body
+
+  const channelOld = await Channel.findOne({ usersOnChannel: { $in: req.user.id } })
+    .then((channel) => {
+      if (channel) {
+        const usersOnline = channel?.usersOnChannel.filter((id) => id !== req.user.id)
+        // eslint-disable-next-line
+        channel.usersOnChannel = usersOnline
+        return channel.save().catch((err) => err)
+      }
+      return channel
+    })
+    .catch((err) => err)
+
+  if (channelId !== channelOld?.id) {
+    await Channel.findOne({ _id: channelId })
+      .then((channel) => {
+        const usersOnline = [...channel.usersOnChannel, req.user.id]
+        // eslint-disable-next-line
+        channel.usersOnChannel = usersOnline
+        return channel.save().catch((err) => err)
+      })
+      .catch((err) => err)
+  }
+
+  const updatedChannels = await Channel.find({}).catch((err) => err)
+
+  res.json(updatedChannels)
+  // return connections.forEach((conn) => {
+  //   conn.emit('updateChannel', JSON.stringify(updatedChannels))
+  // })
+})
+
+// another way of switching channel
 // app.post('/api/v1/channel', auth([]), async (req, res) => {
 //   const { channelId, channelTitle } = req.body
 
-//   const channelOld = Channel.findOne({ usersOnChannel: { $in: req.user.id } }).exec().then((channel) => {
-
-//   })
+//   const channelOld = await Channel.findOne({ usersOnChannel: { $in: req.user.id } })
 
 //   if (channelOld) {
 //     const usersOnline = channelOld.usersOnChannel.filter((id) => id !== req.user.id)
@@ -191,79 +224,10 @@ app.post('/api/v1/channels', async (req, res) => {
 //   const updatedChannels = await Channel.find({})
 
 //   res.json({ updatedChannels, channelTitle })
-//   // return connections.forEach((conn) => {
-//   //   conn.emit('updateChannel', JSON.stringify(updatedChannels))
-//   // })
-// })
-
-app.post('/api/v1/channel', auth([]), async (req, res) => {
-  const { channelId, channelTitle } = req.body
-
-  const channelOld = await Channel.findOne({ usersOnChannel: { $in: req.user.id } })
-
-  if (channelOld) {
-    const usersOnline = channelOld.usersOnChannel.filter((id) => id !== req.user.id)
-    await Channel.updateOne(
-      { usersOnChannel: { $in: req.user.id } },
-      {
-        $set: {
-          usersOnChannel: usersOnline
-        }
-      }
-    )
-  }
-
-  if (channelId !== channelOld?.id) {
-    const channelNew = await Channel.findOne({ _id: channelId })
-    await Channel.updateOne(
-      {
-        _id: channelId
-      },
-      {
-        $set: {
-          usersOnChannel: [...channelNew.usersOnChannel, req.user.id]
-        }
-      }
-    )
-  }
-
-  const updatedChannels = await Channel.find({})
-
-  res.json({ updatedChannels, channelTitle })
-  // return connections.forEach((conn) => {
-  //   conn.emit('updateChannel', JSON.stringify(updatedChannels))
-  // })
-})
-
-// app.post('/api/v1/channel', auth([]), async (req) => {
-//   const { channelId } = req.body
-//   // console.log('channelId', channelId)
-//   // console.log('req.user.id', req.user.id)
-
-//   const channel = await Channel.findOne({ _id: channelId })
-//   // console.log('channel', channel)
-
-//   const updatedUsersOnChannel = channel.usersOnChannel.includes(req.user.id)
-//     ? channel.usersOnChannel.filter((id) => id !== req.user.id)
-//     : [...channel.usersOnChannel, req.user.id]
-//   // console.log('updatedUsersOnChannel', updatedUsersOnChannel)
-
-//   await Channel.updateOne(
-//     { _id: channelId },
-//     { $set: { usersOnChannel: updatedUsersOnChannel } },
-//     { upsert: false }
-//   )
-
-//   const updatedChannels = await Channel.find({})
-//   // console.log('updatedChannels', updatedChannels)
-
-//   return connections.forEach((conn) => {
-//     conn.emit('updateChannel', JSON.stringify(updatedChannels))
-//   })
 // })
 
 app.post('/api/v1/channel/message', auth([]), async (req, res) => {
-  // законмментрированно сохранение сообщений в бд
+  //  сохранение сообщений в бд
   try {
     const { currentChannel, message } = req.body
     const newMessage = new Message({
@@ -295,7 +259,7 @@ app.post('/api/v1/channel/message', auth([]), async (req, res) => {
     res.json({ ...err })
   }
 
-  // без сохранения в бд
+  // без сохранения сообщений в бд
   // try {
   //   const { currentChannel, message } = req.body
   //   const newMessage = new Message({
@@ -311,28 +275,6 @@ app.post('/api/v1/channel/message', auth([]), async (req, res) => {
   // } catch (err) {
   //   res.json({ ...err })
   // }
-
-  // старый код с чтением и записью в файл
-  // const channelOld = await Channel.findOne({ usersOnChannel: { $in: req.user.id } })
-  // const channels = await getChannels()
-  // const updatedChannels = {
-  //   ...channels,
-  //   [currentChannel]: {
-  //     ...channels[currentChannel],
-  //     messages: [...channels[currentChannel].messages, setMessage(id, message)]
-  //   }
-  // }
-  // await writeFile(`${__dirname}/data/channels.json`, JSON.stringify(updatedChannels), 'utf-8')
-
-  // const updatedChannels = await Channel.find({})
-  // res.json(updatedChannels)
-
-  // тупо рассылка строки
-  // const { currentChannel, message } = req.body
-
-  // return connections.forEach(async (conn) => {
-  //   await conn.emit('updateMessages', JSON.stringify({ currentChannel, message }))
-  // })
 })
 
 app.use('/api/', (req, res) => {
@@ -384,18 +326,13 @@ io.on('connection', (connection) => {
       connection.userId = user.uid
       connections.push(connection)
     }
-
-    // connection.emit('chatMessage', JSON.stringify({ message: 'hello world from api' }))
   } catch (err) {
     console.log('error:', err)
   } finally {
     connection.on('disconnect', async () => {
       const user = jwt.verify(connection.handshake.auth.token, config.secret)
-      // console.log('user', user)
       const channelOld = await Channel.findOne({ usersOnChannel: { $in: user.uid } })
-      // console.log('channelOld', channelOld)
       const usersOnline = channelOld?.usersOnChannel.filter((id) => id !== user.uid)
-      // console.log('usersOnline', usersOnline)
       await Channel.updateOne(
         { usersOnChannel: { $in: user.uid } },
         {

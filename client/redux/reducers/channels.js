@@ -30,8 +30,7 @@ export default (state = initialState, action = {}) => {
     case SWITCH_CHANNEL: {
       return {
         ...state,
-        channels: action.channelsArray,
-        currentChannel: action.destinationChannel
+        channels: action.channelsArray
       }
     }
     case SET_CHANNEL: {
@@ -89,8 +88,7 @@ export function switchChannel(channelId, channelTitle) {
       .then(({ data }) => {
         return dispatch({
           type: SWITCH_CHANNEL,
-          channelsArray: data.updatedChannels,
-          destinationChannel: data.channelTitle
+          channelsArray: data
         })
       })
       .catch((err) => err)
