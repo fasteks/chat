@@ -68,7 +68,7 @@ export function addChannel(title) {
 }
 
 export function switchChannel(channelId) {
-  return async () => {
+  return async (dispatch) => {
     await axios({
       method: 'post',
       url: '/api/v1/channel',
@@ -76,14 +76,13 @@ export function switchChannel(channelId) {
         channelId
       }
     })
-    // .then(({ data }) => {
-    //   return dispatch({
-    //     type: SWITCH_CHANNEL,
-    //     channelsObj: data,
-    //     setChannel: action === channelLogin ? channel : ''
-    //   })
-    // })
-    // .catch((err) => err)
+      .then(({ data }) => {
+        return dispatch({
+          type: SWITCH_CHANNEL,
+          channelsArray: data
+        })
+      })
+      .catch((err) => err)
   }
 }
 
