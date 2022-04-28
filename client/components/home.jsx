@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
 import Head from './head'
-// import Main from './main'
+import Main from './main'
 import Sidebar from './sidebar'
 
 import { getChannels } from '../redux/reducers/channels'
@@ -19,7 +19,7 @@ const Home = () => {
       <Head title="Main" />
       <div className="min-h-screen flex">
         <Sidebar />
-        {/* <Main /> */}
+        <Main />
       </div>
     </div>
   )

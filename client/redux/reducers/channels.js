@@ -3,12 +3,14 @@ import axios from 'axios'
 const GET_CHANNELS = '@chat/channels/GET_CHANNELS'
 export const ADD_CHANNEL = '@chat/channels/ADD_CHANNEL'
 export const SWITCH_CHANNEL = '@chat/channels/SWITCH_CHANNEL'
+export const SET_CHANNEL = '@chat/channels/SET_CHANNEL'
 const SEND_MESSAGE = '@chat/channels/SEND_MESSAGE'
 export const channelLogin = 'login'
 export const channelLogout = 'logout'
 
 const initialState = {
-  channels: []
+  channels: [],
+  currentChannel: ''
 }
 
 export default (state = initialState, action = {}) => {
@@ -29,6 +31,12 @@ export default (state = initialState, action = {}) => {
       return {
         ...state,
         channels: action.channelsArray
+      }
+    }
+    case SET_CHANNEL: {
+      return {
+        ...state,
+        currentChannel: action.currentChannelId
       }
     }
     case SEND_MESSAGE: {

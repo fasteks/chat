@@ -14,8 +14,8 @@ const Main = () => {
   const { channels, currentChannel } = useSelector((s) => s.channels)
   const { id } = useSelector((s) => s.auth.user)
   const isChannel = currentChannel.length === 0
-  const areChannels = Object.keys(channels)?.length !== 0
-  const messagesLength = channels[currentChannel]?.messages.length
+  const areChannels = channels?.length !== 0
+  const messagesLength = channels.find((it) => it.title === currentChannel)?.messagesList.length
   const areMessages = messagesLength !== 0
 
   useEffect(() => {

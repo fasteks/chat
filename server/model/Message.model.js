@@ -27,4 +27,4 @@ const messageSchema = new mongoose.Schema(
   }
 )
 
-export default mongoose.model('channels', messageSchema)
+export default mongoose.model('messages', messageSchema)

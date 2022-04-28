@@ -158,7 +158,7 @@ app.post('/api/v1/channels', async (req, res) => {
 
 app.post('/api/v1/channel', auth([]), async (req, res) => {
   const { channelId } = req.body
-  console.log('channelId', channelId)
+
   const channelOld = await Channel.findOne({ usersOnChannel: { $in: req.user.id } })
 
   if (channelOld) {
