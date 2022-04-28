@@ -125,11 +125,12 @@ export function tryGetUserInfo() {
 export function signUp(email, password, confirmPassword) {
   return (dispatch) => {
     if (password !== confirmPassword) {
-      return {
+      return dispatch({
         type: REGISTER,
-        password: `Password doesn't match!`,
-        confirmPassword: `Password doesn't match!`
-      }
+        email,
+        password: 'Password do not match!',
+        confirmPassword: 'Password do not match!'
+      })
     }
     return fetch('/api/v1/auth/register', {
       method: 'post',
@@ -144,9 +145,10 @@ export function signUp(email, password, confirmPassword) {
       .then((res) => res.json())
       .then((data) => {
         if (data.status === 'ok') {
-          dispatch({ type: REGISTER, email: 'Success', password: '', confirmPassword: '' })
+          history.push('/login')
+          return dispatch({ type: REGISTER, email: '', password: '', confirmPassword: '' })
         }
-        dispatch({ type: REGISTER, email: data.err, password: '', confirmPassword: '' })
+        return dispatch({ type: REGISTER, email: data.message, password: '', confirmPassword: '' })
       })
   }
 }

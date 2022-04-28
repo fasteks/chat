@@ -25,16 +25,21 @@ const RegistrationForm = () => {
           <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-                Enter Email:
+                Enter Account Name:
               </label>
               <input
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 id="email"
                 type="text"
                 value={email}
-                placeholder="Email"
+                placeholder="Account Name"
                 onChange={(e) => {
                   dispatch(updateEmailField(e.target.value))
+                }}
+                onClick={() => {
+                  if (email === 'Email already taken') {
+                    dispatch(updateEmailField(''))
+                  }
                 }}
               />
             </div>
@@ -50,6 +55,11 @@ const RegistrationForm = () => {
                 placeholder="******************"
                 onChange={(e) => {
                   dispatch(updatePasswordField(e.target.value))
+                }}
+                onClick={() => {
+                  if (password === 'Password do not match!') {
+                    dispatch(updatePasswordField(''))
+                  }
                 }}
               />
               <label
@@ -67,6 +77,11 @@ const RegistrationForm = () => {
                 onChange={(e) => {
                   dispatch(updateConfirmPassword(e.target.value))
                 }}
+                onClick={() => {
+                  if (confirmPassword === 'Password do not match!') {
+                    dispatch(updateConfirmPassword(''))
+                  }
+                }}
               />
             </div>
             <div className="flex items-center justify-between">
@@ -74,9 +89,7 @@ const RegistrationForm = () => {
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                 type="button"
                 onClick={() => {
-                  if (password === confirmPassword) {
-                    dispatch(signUp(email, password, confirmPassword))
-                  }
+                  dispatch(signUp(email, password, confirmPassword))
                 }}
               >
                 Register

@@ -12,7 +12,6 @@ const Main = () => {
   const [message, setMessage] = useState('')
   const [search, setSearch] = useState('')
   const { channels, currentChannel } = useSelector((s) => s.channels)
-  // const isChannel = currentChannel?.length === 0
   const isChannel = !currentChannel
   const areChannels = channels?.length !== 0
   const messagesLength = channels.find((it) => it.title === currentChannel)?.messagesList.length

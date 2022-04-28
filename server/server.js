@@ -321,7 +321,7 @@ const io = new Server(server)
 io.on('connection', (connection) => {
   try {
     if (connection.handshake.auth.token) {
-      const user = jwt.verify(connection.handshake.auth.token, config.secret)
+      const user = jwt?.verify(connection.handshake.auth.token, config.secret)
       // eslint-disable-next-line
       connection.userId = user.uid
       connections.push(connection)
@@ -330,17 +330,19 @@ io.on('connection', (connection) => {
     console.log('error:', err)
   } finally {
     connection.on('disconnect', async () => {
-      const user = jwt.verify(connection.handshake.auth.token, config.secret)
-      const channelOld = await Channel.findOne({ usersOnChannel: { $in: user.uid } })
-      const usersOnline = channelOld?.usersOnChannel.filter((id) => id !== user.uid)
-      await Channel.updateOne(
-        { usersOnChannel: { $in: user.uid } },
-        {
-          $set: {
-            usersOnChannel: usersOnline
+      if (connection.handshake.auth.token) {
+        const user = jwt.verify(connection.handshake.auth.token, config.secret)
+        const channelOld = await Channel.findOne({ usersOnChannel: { $in: user.uid } })
+        const usersOnline = channelOld?.usersOnChannel.filter((id) => id !== user.uid)
+        await Channel.updateOne(
+          { usersOnChannel: { $in: user.uid } },
+          {
+            $set: {
+              usersOnChannel: usersOnline
+            }
           }
-        }
-      )
+        )
+      }
 
       connections = connections.filter((it) => it.id !== connection.id)
     })

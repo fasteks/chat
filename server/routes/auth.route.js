@@ -43,7 +43,7 @@ router.get('/', auth([]), async (req, res) => {
     res.cookie('token', token, { maxAge: 1000 * 60 * 60 * 48 })
     res.json({ status: 'ok', token, user: req.user })
   } catch (err) {
-    res.json({ status: 'error', err })
+    res.status(400).json({ error: err, message: 'Wrong confidentials' })
   }
 })
 
@@ -59,7 +59,7 @@ router.post('/', async (req, res) => {
     res.cookie('token', token, { maxAge: 1000 * 60 * 60 * 48 })
     res.json({ status: 'ok', token, user })
   } catch (err) {
-    res.json({ status: 'error', err })
+    res.status(400).json({ error: err, message: 'Wrong confidentials' })
   }
 })
 
@@ -67,7 +67,7 @@ router.post('/register', async (req, res) => {
   // try {
   const user = await User.findOne({ email: req.body.email })
   if (user) {
-    res.status(401).json({ status: 'error', err: 'Email already taken' })
+    res.status(401).json({ error: 'err', message: 'Email already taken' })
   }
 
   const userObj = new User({
