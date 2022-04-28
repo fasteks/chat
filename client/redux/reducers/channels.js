@@ -67,14 +67,13 @@ export function addChannel(title) {
   }
 }
 
-export function switchChannel(channelId, userId) {
+export function switchChannel(channelId) {
   return async () => {
     await axios({
       method: 'post',
       url: '/api/v1/channel',
       data: {
-        channelId,
-        userId
+        channelId
       }
     })
     // .then(({ data }) => {

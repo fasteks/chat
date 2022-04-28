@@ -40,8 +40,16 @@ socket.on('updateChannels', (payload) => {
   // без редакса, описание сокетов внутрь юзэффекта и на уровне рутов сделать
 })
 
+// socket.on('updateChannel', (payload, channelId) => {
+//   return store.dispatch({ type: SWITCH_CHANNEL, channelsArray: JSON.parse(payload), channelId: JSON.parse(channelId) })
+// })
+
 socket.on('updateChannel', (payload) => {
   return store.dispatch({ type: SWITCH_CHANNEL, channelsArray: JSON.parse(payload) })
 })
+
+// socket.on('disconect', () => {
+//   socket.emit(switchChannel(store.channel.currentChannel))
+// })
 
 export default store

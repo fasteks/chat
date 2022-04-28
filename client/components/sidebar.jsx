@@ -102,11 +102,11 @@ const Sidebar = () => {
             })}
             onClick={() => {
               if (active === channel._id) {
-                dispatch(switchChannel(channel._id, user._id))
+                dispatch(switchChannel(channel._id))
                 setActive(null)
               }
               if (active !== channel._id) {
-                dispatch(switchChannel(channel._id, user._id))
+                dispatch(switchChannel(channel._id))
                 setActive(channel._id)
               }
             }}

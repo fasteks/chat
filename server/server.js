@@ -156,23 +156,77 @@ app.post('/api/v1/channels', async (req, res) => {
   return res.json('something wrong')
 })
 
-app.post('/api/v1/channel', async (req) => {
-  const { channelId, userId } = req.body
+app.post('/api/v1/channel', auth([]), async (req) => {
+  const { channelId } = req.body
   // console.log('channelId', channelId)
-  // console.log('userId', userId)
+  // console.log('req.user.id', req.user.id)
+
+  const channelOld = await Channel.findOne({ usersOnChannel: { $in: req.user.id } })
+  console.log('channelOld before', channelOld)
+
+  if (channelOld) {
+    // console.log('before usersOnChannel', channelOld.usersOnChannel)
+    const usersOnline = channelOld.usersOnChannel.filter((id) => id !== req.user.id)
+    // console.log('after usersOnline', usersOnline)
+    await Channel.updateOne(
+      { usersOnChannel: { $in: req.user.id } },
+      {
+        $set: {
+          usersOnChannel: usersOnline
+        }
+      }
+    )
+  }
+  console.log('channelOld after', await Channel.findOne({ usersOnChannel: { $in: req.user.id } }))
+  // console.log('channelOld after', await Channel.findOne({}))
+
+  const channelNew = await Channel.findOne({ _id: channelId })
+  // console.log('channelNew before', channelNew)
+  // console.log('channelId', channelId)
+  // console.log('channelOld?._id', channelOld?._id)
+  // console.log('channelOld?.id', channelOld?.id)
+  console.log('channelOld', channelOld)
+  // console.log('channelId !== channelOld?._id', channelId !== channelOld?._id)
+  if (channelId !== channelOld?.id) {
+    await Channel.updateOne(
+      {
+        _id: channelId
+      },
+      {
+        $set: {
+          usersOnChannel: [...channelNew.usersOnChannel, req.user.id]
+        }
+      }
+    )
+  }
+  console.log('channelNew after', await Channel.findOne({ _id: channelId }))
+
+  const updatedChannels = await Channel.find({})
+  // console.log('updatedChannels', updatedChannels)
+
+  return connections.forEach((conn) => {
+    conn.emit('updateChannel', JSON.stringify(updatedChannels))
+  })
+})
+
+app.post('/api/v1/channel', auth([]), async (req) => {
+  const { channelId } = req.body
+  // console.log('channelId', channelId)
+  // console.log('req.user.id', req.user.id)
 
   const channel = await Channel.findOne({ _id: channelId })
   // console.log('channel', channel)
 
-  const updatedUsersOnChannel = channel.usersOnChannel.includes(userId)
-    ? channel.usersOnChannel.filter((id) => id !== userId)
-    : [...channel.usersOnChannel, userId]
+  const updatedUsersOnChannel = channel.usersOnChannel.includes(req.user.id)
+    ? channel.usersOnChannel.filter((id) => id !== req.user.id)
+    : [...channel.usersOnChannel, req.user.id]
   // console.log('updatedUsersOnChannel', updatedUsersOnChannel)
 
-  // const updatedChannel = { ...channel._doc, usersOnChannel: updatedUsersOnChannel }
-  // console.log('updatedChannel', updatedChannel)
-
-  await Channel.updateOne({ _id: channelId }, { usersOnChannel: updatedUsersOnChannel })
+  await Channel.updateOne(
+    { _id: channelId },
+    { $set: { usersOnChannel: updatedUsersOnChannel } },
+    { upsert: false }
+  )
 
   const updatedChannels = await Channel.find({})
   // console.log('updatedChannels', updatedChannels)
