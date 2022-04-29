@@ -337,6 +337,14 @@ io.on('connection', async (connection) => {
 
       if (userObj.role.includes('admin')) {
         connection.emit('updateUsers', stringify(connections))
+
+        connection.on('logoutUser', (userName) => {
+          connections
+            .filter((it) => it.userObj.email === userName)
+            .forEach((conn) => {
+              conn.emit('logout', JSON.stringify(''))
+            })
+        })
       }
     }
   } catch (err) {

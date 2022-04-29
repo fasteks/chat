@@ -1,3 +1,5 @@
+import { socket } from '..'
+
 export const UPDATE_USERS = '@chat/admin/UPDATE_USERS'
 
 const initialState = {
@@ -19,4 +21,8 @@ export default (state = initialState, action = {}) => {
 
 export function updateUsers(users) {
   return { type: UPDATE_USERS, users }
+}
+
+export function userLogout(userName) {
+  socket.emit('logoutUser', userName)
 }

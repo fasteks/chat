@@ -26,7 +26,7 @@ const store = createStore(rootReducer(history), initialState, composedEnhancers)
 
 const cookies = new Cookies()
 
-const socket = io('/', {
+export const socket = io('/', {
   auth: {
     token: cookies.get('token')
   }
@@ -71,6 +71,12 @@ socket.on('updateMessages', (payload) => {
 
 socket.on('updateUsers', (payload) => {
   return store.dispatch({ type: UPDATE_USERS, users: parse(payload) })
+})
+
+socket.on('logout', () => {
+  window.location = ''
+  cookies.remove('token')
+  // return store.dispatch({ type: UPDATE_USERS, users: parse(payload) })
 })
 
 export default store
