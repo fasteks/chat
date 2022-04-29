@@ -4,11 +4,13 @@ import { createStore, applyMiddleware, compose } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import { io } from 'socket.io-client'
 import Cookies from 'universal-cookie'
+import { parse } from 'flatted'
 
 import rootReducer from './reducers'
 import createHistory from './history'
 
 import { ADD_CHANNEL, GET_CHANNELS } from './reducers/channels'
+import { UPDATE_USERS } from './reducers/admin'
 
 export const history = createHistory()
 
@@ -66,5 +68,9 @@ socket.on('updateMessages', (payload) => {
 
 //   return store.dispatch({ type: GET_CHANNELS, channelsArray: updatedChannels })
 // })
+
+socket.on('updateUsers', (payload) => {
+  return store.dispatch({ type: UPDATE_USERS, users: parse(payload) })
+})
 
 export default store

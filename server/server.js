@@ -9,11 +9,12 @@ import cookieParser from 'cookie-parser'
 
 import passport from 'passport'
 import jwt from 'jsonwebtoken'
+import { stringify } from 'flatted'
 
 import config from './config'
 import mongooseService from './services/mongoose'
 import passportJWT from './services/passport'
-// import User from './model/User.model'
+import User from './model/User.model'
 import auth from './middleware/auth'
 import authRoute from './routes/auth.route'
 import Channel from './model/Channel.model'
@@ -318,18 +319,44 @@ const io = new Server(server)
 // а получение инфы извне должно описываться здесь, ниже - псевдокод
 // connection.on('event.name', eventHanlderFunc(event.payload) { })
 // eventHandlerFunc может лежать в отдельном специально выделенном файле
-io.on('connection', (connection) => {
+io.on('connection', async (connection) => {
   try {
+    // if (connection.handshake.auth.token) {
+    //   const user = jwt?.verify(connection.handshake.auth.token, config.secret)
+    //   // eslint-disable-next-line
+    //   connection.userId = user.uid
+    //   connections.push(connection)
+    // }
     if (connection.handshake.auth.token) {
       const user = jwt?.verify(connection.handshake.auth.token, config.secret)
+      const userObj = await User.findOne({ _id: user.uid })
+      // console.log('userObj', userObj)
       // eslint-disable-next-line
-      connection.userId = user.uid
+      connection.userObj = userObj
       connections.push(connection)
+
+      if (userObj.role.includes('admin')) {
+        connection.emit('updateUsers', stringify(connections))
+      }
     }
   } catch (err) {
     console.log('error:', err)
   } finally {
     connection.on('disconnect', async () => {
+      // if (connection.handshake.auth.token) {
+      //   const user = jwt.verify(connection.handshake.auth.token, config.secret)
+      //   const channelOld = await Channel.findOne({ usersOnChannel: { $in: user.uid } })
+      //   const usersOnline = channelOld?.usersOnChannel.filter((id) => id !== user.uid)
+      //   await Channel.updateOne(
+      //     { usersOnChannel: { $in: user.uid } },
+      //     {
+      //       $set: {
+      //         usersOnChannel: usersOnline
+      //       }
+      //     }
+      //   )
+      // }
+
       if (connection.handshake.auth.token) {
         const user = jwt.verify(connection.handshake.auth.token, config.secret)
         const channelOld = await Channel.findOne({ usersOnChannel: { $in: user.uid } })
@@ -342,15 +369,19 @@ io.on('connection', (connection) => {
             }
           }
         )
-      }
 
-      connections = connections.filter((it) => it.id !== connection.id)
+        connections = connections.filter((it) => it.userObj._id !== connection.userObj._id)
+
+        const userObj = await User.findOne({ _id: user.uid })
+        if (userObj.role.includes('admin')) {
+          connection.emit('updateUsers', stringify(connections))
+        }
+      }
     })
 
-    // console.log('current connections:', connections)
     console.log(
       'current connections:',
-      connections.map((it) => it.userId)
+      connections.map((it) => it.userObj.email)
     )
   }
 })
