@@ -368,6 +368,7 @@ io.on('connect', async (connection) => {
       }
     }
   } catch (err) {
+    // eslint-disable-next-line
     console.log('error:', err)
   } finally {
     connection.on('disconnect', async () => {
@@ -407,6 +408,7 @@ io.on('connect', async (connection) => {
       }
     })
 
+    // eslint-disable-next-line
     console.log(
       'current connections:',
       connections.map((it) => it.userObj.email)
