@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBell, faBellSlash } from '@fortawesome/free-regular-svg-icons'
@@ -124,6 +125,11 @@ const Sidebar = () => {
         <p>Olivia</p>
       </div>
       <h3 className="sidebar__applications">Applications</h3>
+      {1 && (
+        <Link className="mx-auto mt-auto" to="/admin">
+          admin pannel
+        </Link>
+      )}
     </div>
   )
 }

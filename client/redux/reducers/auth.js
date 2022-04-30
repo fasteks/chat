@@ -76,9 +76,9 @@ export function updateConfirmPassword(confirmPassword) {
 }
 
 export function signIn() {
-  return (dispatch, getState) => {
+  return async (dispatch, getState) => {
     const { email, password } = getState().auth
-    fetch('/api/v1/auth', {
+    await fetch('/api/v1/auth', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json'
@@ -97,9 +97,9 @@ export function signIn() {
 }
 
 export function trySignIn() {
-  return (dispatch, getState) => {
+  return async (dispatch, getState) => {
     const { pathname } = getState().router.location
-    fetch('/api/v1/auth')
+    await fetch('/api/v1/auth')
       .then((res) => res.json())
       .then((data) => {
         dispatch({ type: LOGIN, token: data.token, user: data.user, password: '' })

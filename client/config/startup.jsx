@@ -8,10 +8,10 @@ const Startup = (props) => {
   const dispatch = useDispatch()
   const token = useSelector((s) => s.auth.token)
 
-  useEffect(() => {
+  useEffect(async () => {
     if (token) {
-      dispatch(tryGetUserInfo())
       dispatch(trySignIn())
+      dispatch(tryGetUserInfo())
     }
   }, [])
 

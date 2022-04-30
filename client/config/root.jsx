@@ -25,11 +25,31 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
   const auth = useSelector((s) => s.auth)
 
   const func = (props) => {
-    if (!!auth.user && !!auth.token && auth.user.role?.includes('admin')) {
+    // if (!!auth.user && !!auth.token && auth.user.role?.includes('admin')) {
+    //   return <Component {...props} />
+    // }
+
+    if (!!auth.user && !!auth.token) {
       return <Component {...props} />
     }
 
-    if (!!auth.user && !!auth.token) {
+    return (
+      <Redirect
+        to={{
+          pathname: '/login'
+        }}
+      />
+    )
+  }
+
+  return <Route {...rest} render={func} />
+}
+
+const PrivateRouteAdmin = ({ component: Component, ...rest }) => {
+  const auth = useSelector((s) => s.auth)
+
+  const func = (props) => {
+    if (!!auth.user && !!auth.token && auth.user.role?.includes('admin')) {
       return <Component {...props} />
     }
 
@@ -54,9 +74,10 @@ const RootComponent = (props) => {
       <RouterSelector history={history} location={props.location} context={props.context}>
         <Startup>
           <Switch>
+            <PrivateRouteAdmin exact path="/admin" component={Admin} />
             <PrivateRoute exact path="/chat" component={Home} />
-            <PrivateRoute exact path="/admin" component={Admin} />
             <OnlyAnonymousRoute exact path="/login" component={LoginForm} />
+            {/* <PrivateRoute exact path="/admin" component={Admin} /> */}
             <Route exact path="/registration" component={RegistrationForm} />
             <Route exact path="/" component={LoginForm} />
             <Route component={NotFound} />

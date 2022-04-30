@@ -319,7 +319,7 @@ const io = new Server(server)
 // а получение инфы извне должно описываться здесь, ниже - псевдокод
 // connection.on('event.name', eventHanlderFunc(event.payload) { })
 // eventHandlerFunc может лежать в отдельном специально выделенном файле
-io.on('connection', async (connection) => {
+io.on('connect', async (connection) => {
   try {
     // if (connection.handshake.auth.token) {
     //   const user = jwt?.verify(connection.handshake.auth.token, config.secret)
@@ -327,15 +327,35 @@ io.on('connection', async (connection) => {
     //   connection.userId = user.uid
     //   connections.push(connection)
     // }
+
+    // у лехи в каком-то проекте
+    // let { token } = connection.handshake.auth
+    // if (typeof token !== 'undefined') {
+    // ...
+    // connection.userId = user.uid
+    // connection.isAdmin = user.role === 'admin'
+
     if (connection.handshake.auth.token) {
       const user = jwt?.verify(connection.handshake.auth.token, config.secret)
       const userObj = await User.findOne({ _id: user.uid })
-      // console.log('userObj', userObj)
+      // лучше всего в connections добавлять только user.uid
+      // ибо чем больше юзеров, тем больше памяти сервер будет занимать
+      // в случае надобности, сделать объекты с user.uid и доп. полями, например, имя аккаунта
+      // как указанно в примере Лехи выше
       // eslint-disable-next-line
       connection.userObj = userObj
+      // способ добавления целого объекта юзера плох тем, что данные в connections
+      // могут "отставать" от данных в дб, обновленных уже после открытия сокета
+      // с записанным целиком объектом userObj
+      // при этом, конечно, user.uid записанныей в дб будет прежним, а имя может меняться,
+      // что не мешает верно управлять сокетами используя сортировку по id
+      // но отображаемые данные, будут запаздывать, на время "переоткрытия" юзером сесси
       connections.push(connection)
 
+      // функции event hanlder-ов лучше хранить в отдельном файле
       if (userObj.role.includes('admin')) {
+        // то есть здесь, вероятно лучше, брать массив айди коннекшенов
+        // и к ним добавлять нужные доп. данные выдергивая из дб
         connection.emit('updateUsers', stringify(connections))
 
         connection.on('logoutUser', (userName) => {
