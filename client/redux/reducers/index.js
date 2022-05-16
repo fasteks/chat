@@ -5,12 +5,13 @@ import auth from './auth'
 import channels from './channels'
 import admin from './admin'
 
-const createRootReducer = (history) =>
-  combineReducers({
+const createRootReducer = (history) => {
+  return combineReducers({
     router: connectRouter(history),
     auth,
     channels,
     admin
   })
+}
 
 export default createRootReducer

@@ -19,6 +19,7 @@ const Sidebar = () => {
   const [bell, setBell] = useState(true)
   const [channelsClicked, setchannelsClicked] = useState(false)
   const [channelNew, setChannelNew] = useState('')
+  const isAdmin = user.role?.includes('admin')
 
   return (
     <div className="sidebar flex flex-col">
@@ -125,7 +126,7 @@ const Sidebar = () => {
         <p>Olivia</p>
       </div>
       <h3 className="sidebar__applications">Applications</h3>
-      {1 && (
+      {isAdmin && (
         <Link className="mx-auto mt-auto" to="/admin">
           admin pannel
         </Link>
