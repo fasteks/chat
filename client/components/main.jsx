@@ -16,6 +16,10 @@ const Main = () => {
   const areChannels = channels?.length !== 0
   const messagesLength = channels.find((it) => it.title === currentChannel)?.messagesList.length
   const areMessages = messagesLength !== 0
+  const memoizedMessagesArray = React.useMemo(
+    () => channels?.find((it) => it.title === currentChannel)?.messagesList,
+    [channels?.find((it) => it.title === currentChannel)?.messagesList]
+  )
 
   useEffect(() => {
     document.querySelector('.main__messages')?.lastChild?.scrollIntoView()
@@ -47,9 +51,11 @@ const Main = () => {
         {isChannel && !areChannels && <p className="messages__alert">Make a channel!</p>}
         {!isChannel &&
           areMessages &&
-          channels
-            ?.find((it) => it.title === currentChannel)
-            ?.messagesList.map((it) => {
+          // channels
+          //   ?.find((it) => it.title === currentChannel)
+          //   ?.messagesList.map((it) => {
+          memoizedMessagesArray
+            .map((it) => {
               return <Message key={it._id} message={it} />
             })
             .filter((it) =>
