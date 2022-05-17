@@ -16,6 +16,10 @@ const Main = () => {
   const areChannels = channels?.length !== 0
   const messagesLength = channels.find((it) => it.title === currentChannel)?.messagesList.length
   const areMessages = messagesLength !== 0
+
+  // Сохраняет результат выполнения функций для предотвращения повторных вычислений
+  // useCallback возвращает функцию
+  // useMemo возвращает объект
   const memoizedMessagesArray = React.useMemo(
     () => channels?.find((it) => it.title === currentChannel)?.messagesList,
     [channels?.find((it) => it.title === currentChannel)?.messagesList]
