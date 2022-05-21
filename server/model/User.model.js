@@ -82,13 +82,13 @@ userSchema.static({
     const user = await this.findOne({ email })
 
     if (!user) {
-      throw new Error('No User')
+      throw new Error('No such User')
     }
 
     const isPasswordOk = await user.passwordMatches(password)
 
     if (!isPasswordOk) {
-      throw new Error('PasswordIncorrect')
+      throw new Error('Incorrect Password')
     }
 
     return user

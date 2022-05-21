@@ -6,9 +6,9 @@ import { Switch, Route, Redirect, StaticRouter } from 'react-router-dom'
 import store, { history } from '../redux'
 
 import Home from '../components/home'
-import LoginForm from '../components/login'
+import LoginForm from '../components/loginFormik'
 import NotFound from '../components/404'
-import RegistrationForm from '../components/registration'
+import RegistrationForm from '../components/registrationFormik'
 
 import Startup from './startup'
 

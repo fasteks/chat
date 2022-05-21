@@ -10,6 +10,7 @@ import jwt from 'jsonwebtoken'
 import config from '../config'
 import auth from '../middleware/auth'
 import User from '../model/User.model'
+import validateUser from '../validate/user.register.validate'
 
 const router = express.Router()
 
@@ -59,15 +60,15 @@ router.post('/', async (req, res) => {
     res.cookie('token', token, { maxAge: 1000 * 60 * 60 * 48 })
     res.json({ status: 'ok', token, user })
   } catch (err) {
-    res.status(400).json({ error: err, message: 'Wrong confidentials' })
+    res.status(400).json({ status: 'error', error: err.message, message: 'Wrong confidentials' })
   }
 })
 
-router.post('/register', async (req, res) => {
+router.post('/register', validateUser, async (req, res) => {
   // try {
   const user = await User.findOne({ email: req.body.email })
   if (user) {
-    res.status(401).json({ error: 'err', message: 'Email already taken' })
+    return res.status(400).json({ status: 'error', message: 'Account name already taken!' })
   }
 
   const userObj = new User({
@@ -75,7 +76,7 @@ router.post('/register', async (req, res) => {
     password: req.body.password
   })
   userObj.save()
-  res.json({ status: 'ok' })
+  return res.json({ status: 'ok', message: 'Registration succeed!' })
   // } catch (err) {
   //   res.json({ status: 'error', err })
   // }

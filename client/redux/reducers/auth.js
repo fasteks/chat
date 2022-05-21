@@ -6,6 +6,7 @@ const UPDATE_PASSWORD = '@chat/auth/UPDATE_PASSWORD'
 const UPDATE_CONFIRM_PASSWORD = '@chat/auth/UPDATE_CONFIRM_PASSWORD'
 const LOGIN = '@chat/auth/LOGIN'
 const REGISTER = '@chat/auth/REGISTER'
+const SET_RESPONSE = '@chat/auth/SET_RESPONSE'
 
 const cookies = new Cookies()
 
@@ -14,12 +15,8 @@ const initialState = {
   password: '',
   confirmPassword: '',
   token: cookies.get('token'),
-  user: {}
-  // user: {
-  //   name: 'fasteks',
-  //   id: '28',
-  //   isOnline: true
-  // }
+  user: {},
+  response: ''
 }
 
 export default (state = initialState, action = {}) => {
@@ -58,6 +55,12 @@ export default (state = initialState, action = {}) => {
         confirmPassword: action.confirmPassword
       }
     }
+    case SET_RESPONSE: {
+      return {
+        ...state,
+        response: action.response
+      }
+    }
     default:
       return state
   }
@@ -75,9 +78,33 @@ export function updateConfirmPassword(confirmPassword) {
   return { type: UPDATE_CONFIRM_PASSWORD, confirmPassword }
 }
 
-export function signIn() {
-  return async (dispatch, getState) => {
-    const { email, password } = getState().auth
+export function updateResponse(response) {
+  return { type: SET_RESPONSE, response }
+}
+
+// export function signIn() {
+//   return async (dispatch, getState) => {
+//     const { email, password } = getState().auth
+//     await fetch('/api/v1/auth', {
+//       method: 'post',
+//       headers: {
+//         'Content-Type': 'application/json'
+//       },
+//       body: JSON.stringify({
+//         email,
+//         password
+//       })
+//     })
+//       .then((res) => res.json())
+//       .then((data) => {
+//         dispatch({ type: LOGIN, token: data.token, user: data.user, password: '' })
+//         history.push('/chat')
+//       })
+//   }
+// }
+
+export function signIn(email, password) {
+  return async (dispatch) => {
     await fetch('/api/v1/auth', {
       method: 'post',
       headers: {
@@ -90,9 +117,15 @@ export function signIn() {
     })
       .then((res) => res.json())
       .then((data) => {
-        dispatch({ type: LOGIN, token: data.token, user: data.user, password: '' })
-        history.push('/chat')
+        if (data.status === 'ok') {
+          dispatch({ type: SET_RESPONSE, response: data.message })
+          dispatch({ type: LOGIN, token: data.token, user: data.user, password: '' })
+          history.push('/chat')
+        } else {
+          dispatch({ type: SET_RESPONSE, response: data.error })
+        }
       })
+      .catch((err) => err)
   }
 }
 
@@ -107,6 +140,7 @@ export function trySignIn() {
           history.push('/chat')
         }
       })
+      .catch((err) => err)
   }
 }
 
@@ -119,36 +153,41 @@ export function tryGetUserInfo() {
           history.push('/chat')
         }
       })
+      .catch((err) => err)
   }
 }
 
-export function signUp(email, password, confirmPassword) {
-  return (dispatch) => {
-    if (password !== confirmPassword) {
-      return dispatch({
-        type: REGISTER,
-        email,
-        password: 'Password do not match!',
-        confirmPassword: 'Password do not match!'
-      })
-    }
-    return fetch('/api/v1/auth/register', {
+export function signUp(email, password, confirm_password) {
+  return async (dispatch) => {
+    await fetch('/api/v1/auth/register', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         email,
-        password
+        password,
+        confirm_password
       })
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data.status === 'ok') {
-          history.push('/login')
-          return dispatch({ type: REGISTER, email: '', password: '', confirmPassword: '' })
-        }
-        return dispatch({ type: REGISTER, email: data.message, password: '', confirmPassword: '' })
+        dispatch({ type: SET_RESPONSE, response: data.message })
+
+        // if (data.status === 'ok') {
+        //   dispatch({ type: SET_RESPONSE, response: data.message })
+        // } else {
+        //   dispatch({ type: SET_RESPONSE, response: data.message })
+        // }
+
+        // if (data.status === 'ok') {
+        //   dispatch({ type: SET_RESPONSE, response: 'Registration succeed!' })
+        //   // history.push('/login')
+        // }
+        // if (data.status === 'error') {
+        //   dispatch({ type: SET_RESPONSE, response: data.message })
+        // }
       })
+      .catch((err) => err)
   }
 }
