@@ -1,13 +1,13 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
+
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
-import { history } from '../redux'
+import Head from './head'
 
 import { signUp, updateResponse } from '../redux/reducers/auth'
-
-import Head from './head'
 
 const RegistrationForm = () => {
   const dispatch = useDispatch()
@@ -69,7 +69,7 @@ const RegistrationForm = () => {
               {(formik.touched.email && formik.errors.email) || response ? (
                 <p className="text-red-500 text-xs italic">{formik.errors.email || response}</p>
               ) : (
-                <p className="text-red-500 text-xs italic">&nbsp;</p>
+                <p className="invisible text-red-500 text-xs italic">&nbsp;</p>
               )}
             </div>
             <div className="mb-6">
@@ -90,7 +90,7 @@ const RegistrationForm = () => {
                   {formik.errors.password}
                 </p>
               ) : (
-                <p className="flex flex-wrap text-red-500 text-xs italic">&nbsp;</p>
+                <p className="invisible flex flex-wrap text-red-500 text-xs italic">&nbsp;</p>
               )}
               <label
                 className="mt-4 block text-gray-700 text-sm font-bold mb-2"
@@ -110,7 +110,7 @@ const RegistrationForm = () => {
               {formik.touched.confirm_password && formik.errors.confirm_password ? (
                 <p className="text-red-500 text-xs italic">{formik.errors.confirm_password}</p>
               ) : (
-                <p className="text-red-500 text-xs italic">&nbsp;</p>
+                <p className="invisible text-red-500 text-xs italic">&nbsp;</p>
               )}
             </div>
             <div className="flex items-center justify-between">
@@ -120,15 +120,12 @@ const RegistrationForm = () => {
               >
                 Register
               </button>
-              <button
+              <Link
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                type="button"
-                onClick={() => {
-                  history.push('/login')
-                }}
+                to="/login"
               >
                 Back
-              </button>
+              </Link>
             </div>
           </form>
         </div>

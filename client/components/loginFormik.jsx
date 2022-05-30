@@ -1,5 +1,6 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
@@ -7,7 +8,6 @@ import * as Yup from 'yup'
 import Head from './head'
 
 import { signIn, updateResponse } from '../redux/reducers/auth'
-import { history } from '../redux'
 
 const LoginFormik = () => {
   const dispatch = useDispatch()
@@ -59,15 +59,10 @@ const LoginFormik = () => {
                 placeholder="Account Name"
                 onChange={formik.handleChange}
               />
-              {/* {formik.touched.email && formik.errors.email ? (
-                <p className="text-red-500 text-xs italic">{formik.errors.email}</p>
-              ) : (
-                <p className="text-red-500 text-xs italic">&nbsp;</p>
-              )} */}
               {(formik.touched.email && formik.errors.email) || response ? (
                 <p className="text-red-500 text-xs italic">{formik.errors.email || response}</p>
               ) : (
-                <p className="text-red-500 text-xs italic">&nbsp;</p>
+                <p className="invisible text-red-500 text-xs italic">&nbsp;</p>
               )}
             </div>
             <div className="mb-4">
@@ -86,7 +81,7 @@ const LoginFormik = () => {
               {formik.touched.password && formik.errors.password ? (
                 <p className="text-red-500 text-xs italic">{formik.errors.password}</p>
               ) : (
-                <p className="text-red-500 text-xs italic">&nbsp;</p>
+                <p className="invisible text-red-500 text-xs italic">&nbsp;</p>
               )}
             </div>
             <div className="flex items-center justify-between">
@@ -96,15 +91,12 @@ const LoginFormik = () => {
               >
                 Sign In
               </button>
-              <button
+              <Link
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                type="button"
-                onClick={() => {
-                  history.push('/registration')
-                }}
+                to="/registration"
               >
                 Sign Up
-              </button>
+              </Link>
             </div>
           </form>
         </div>

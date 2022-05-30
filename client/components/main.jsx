@@ -109,6 +109,7 @@ const Main = () => {
                 setMessage('')
               }
             }}
+            onto
             placeholder={`Message to ${currentChannel}`}
           />
         </div>
