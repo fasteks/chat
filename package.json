@@ -10,7 +10,7 @@
         "watch:client": "webpack serve --mode development --config ./webpack.development.config.js",
         "dev:server": "webpack  --watch --config webpack.development.config.js",
         "start:dev": "webpack serve --mode development --config ./webpack.development.config.js --open",
-        "start": "cross-env NODE_ENV=production && node start.js",
+        "start": "cross-env NODE_ENV=production && yarn run build:ssr && node start.js",
         "clean": "rimraf dist",
         "lint": "eslint './server/**/*.js' './client/**/*.js' './client/**/*.jsx'",
         "prettier": "prettier './client/**/*.js' './client/**/*.jsx' './server/**/*.js' --write",
